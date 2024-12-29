@@ -1,0 +1,36 @@
+name: black-action
+on: [push, pull_request]
+jobs:
+  linter_name:
+    name: runner/black
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Check those fine sneks out
+      - name: Fact checking
+        uses: rickstaa/action-black@v1
+        id: action_black
+        with:
+          black_args: "."
+      - name: Throw shade
+        if: steps.action_black.outputs.is_formatted == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "dis 🐍 be lookin' fine af 💅✨"
+          commit-message: |
+            Stay fabulous, sneks. We stan. 💖🐍
+          body: |
+            Okay, so the current scriptures need some skibidi adjustments, but OMG, have you seen those snek pics? 🐍✨ Like, for real, these slithery bois are serving looks! 💅
+            1. This one’s got those iridescent scales that shine like a rainbow in the sun. 🌈✨ Legit, it’s like Mother Nature decided to flex on us. #SnekGoals
+            2. Spotted pattern? Check. Regal AF? Double check. This snek is basically the royalty of the reptile world. 👑🐍 Bow down, peasants.
+            3. Snek #3: Albino snek with those red eyes? Bruh, it’s like a mythical creature straight outta a fantasy novel. 🧙‍♂️✨ #SnekMagic
+            4. Green tree python just chilling on a branch, looking like it owns the place. 🌿🐍 This snek is the definition of “I woke up like this.” #Flawless
+
+            And let’s not forget their sassy little tongues flicking out like they’re tasting the air for drama. 👅💅 These sneks are out here living their best lives, making us all look basic in comparison.
+
+            So, next time you see a snek, remember: they’re not just reptiles, they’re fashion icons. 🐍✨ #SnekLife #SlitherAndShine
+
+            Stay fabulous, sneks. We stan. 💖🐍
+          base: ${{ github.head_ref }} # Creates pull request onto pull request or commit branch
+          branch: pretty
