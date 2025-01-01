@@ -7,6 +7,6 @@ from app_base import BaseApp
 
 # from app_ms import MSApp
 
-app = BaseApp(400, 600)
+app = BaseApp()
 app.run()
 app.close()

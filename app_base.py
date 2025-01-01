@@ -4,45 +4,33 @@ from base_game import BaseGame
 from abc import ABC
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from constants import KEY_DELTA_T
-
-PIXEL_NUM_HORIZONTAL = 28
-PIXEL_NUM_VERTICAL = 14
-PIXEL_SIZE_HORIZONTAL = 97.6
-PIXEL_SPACING_HORIZONTAL = 42.9
-PIXEL_SIZE_VERTICAL = 161
-PIXEL_SPACING_VERTICAL = 162.8
-
-SCREEN_BASE_WIDTH = (
-    PIXEL_NUM_HORIZONTAL * PIXEL_SIZE_HORIZONTAL
-    + (PIXEL_NUM_HORIZONTAL - 1) * PIXEL_SPACING_HORIZONTAL
-)
-SCREEN_BASE_HEIGHT = (
-    PIXEL_NUM_VERTICAL * PIXEL_SIZE_VERTICAL
-    + (PIXEL_NUM_VERTICAL - 1) * PIXEL_SPACING_VERTICAL
-)
+from constants import KEY_DELTA_T, SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT
 
 
 class BaseApp(ABC):
-    def __init__(self, GAME_WIDTH=SCREEN_BASE_WIDTH, GAME_HEIGHT=SCREEN_BASE_HEIGHT):
+    def __init__(
+        self,
+        screen_size=(600, int(600 / SCREEN_BASE_WIDTH * SCREEN_BASE_HEIGHT)),
+        game_size=(SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT),
+    ):
         pygame.init()
-        self.game_width = GAME_WIDTH
-        self.game_height = GAME_HEIGHT
+        self.game_size = game_size
+        self.screen_size = screen_size
         self.clock = pygame.time.Clock()
         self.screen = self.initScreen()
         self.basegame = self.initGame()
         pygame.display.set_caption("Didactic Guacamole")
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glMatrixMode(GL_PROJECTION)
-        gluOrtho2D(0, GAME_WIDTH, 0, GAME_HEIGHT)
+        gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
 
     def initScreen(self) -> pygame.surface.Surface:
         return pygame.display.set_mode(
-            (self.game_width, self.game_height), flags=pygame.DOUBLEBUF | pygame.OPENGL
+            self.screen_size, flags=pygame.DOUBLEBUF | pygame.OPENGL
         )
 
     def initGame(self) -> BaseGame:
-        return BaseGame(self.game_width, self.game_height)
+        return BaseGame(self.game_size[0], self.game_size[0])
 
     def run(self) -> None:
         running = True
