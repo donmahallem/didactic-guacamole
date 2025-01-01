@@ -16,5 +16,4 @@ class BaseGame(pygame.sprite.Group):
         self.player.velocity.update(300, 30)
 
     def draw(self):
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
         self.player.draw()

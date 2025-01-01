@@ -2,9 +2,10 @@ import pygame
 import sys
 from base_game import BaseGame
 from abc import ABC
-from OpenGL.GL import *
+from OpenGL import GL
 from OpenGL.GLU import *
 from constants import KEY_DELTA_T, SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT
+from pixel_shader import PixelateShader
 
 
 class BaseApp(ABC):
@@ -20,9 +21,10 @@ class BaseApp(ABC):
         self.screen = self.initScreen()
         self.basegame = self.initGame()
         pygame.display.set_caption("Didactic Guacamole")
-        glClearColor(0.0, 0.0, 0.0, 1.0)
-        glMatrixMode(GL_PROJECTION)
+        GL.glClearColor(0.0, 0.0, 0.0, 1.0)
+        GL.glMatrixMode(GL.GL_PROJECTION)
         gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
+        self.pixel_shader = PixelateShader(self.screen_size)
 
     def initScreen(self) -> pygame.surface.Surface:
         return pygame.display.set_mode(
@@ -32,6 +34,14 @@ class BaseApp(ABC):
     def initGame(self) -> BaseGame:
         return BaseGame(self.game_size[0], self.game_size[0])
 
+    def draw(self) -> None:
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.pixel_shader.frameBuffer)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        self.basegame.draw()
+        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
+        self.pixel_shader.draw()
+        pygame.display.flip()
+
     def run(self) -> None:
         running = True
         while running:
@@ -40,11 +50,9 @@ class BaseApp(ABC):
                     running = False
 
             deltaT = self.clock.tick()
-            # Clear the screen
             self.basegame.update(**{KEY_DELTA_T: deltaT})
-            self.basegame.draw()
-            pygame.display.flip()
-            # Update the display
+            self.draw()
+            self.pixel_shader.draw()
 
     def close(self) -> None:
         pygame.quit()
