@@ -1,24 +1,8 @@
+from pygame.locals import *
 from OpenGL import GL
-
-vertex_shader_source = """
-#version 330 core
-layout(location = 0) in vec2 position;
-void main() {
-gl_Position = vec4(position, 0.0, 1.0);
-}
-"""
-fragment_shader_source = """
-#version 330 core
-out vec4 FragColor;
-void main() {
-vec2 uv = gl_FragCoord.xy / vec2(100.0, 800.0);
-vec2 pixelated_uv = floor(uv * 10.0) / 10.0;
-FragColor = vec4(uv, 0.0, 1.0);
-}
-"""
+import numpy as np
 
 
-# Compile shader
 def compile_shader(source, shader_type):
     shader = GL.glCreateShader(shader_type)
     GL.glShaderSource(shader, source)
@@ -28,7 +12,6 @@ def compile_shader(source, shader_type):
     return shader
 
 
-# Create shader program
 def create_shader_program(vertex_source, fragment_source):
     vertex_shader = compile_shader(vertex_source, GL.GL_VERTEX_SHADER)
     fragment_shader = compile_shader(fragment_source, GL.GL_FRAGMENT_SHADER)
@@ -43,78 +26,13 @@ def create_shader_program(vertex_source, fragment_source):
     return program
 
 
-def createPixelShader():
-    return create_shader_program(vertex_shader_source, fragment_shader_source)
-
-
-import pygame
-from pygame.locals import *
-from OpenGL import GL
-import math
-import numpy as np
-
-vertex_shader = """
-#version 330
-in vec2 position;
-void main() {
-    gl_Position = vec4(position, 0.0, 1.0);
-}
-"""
-
-fragment_shader_squares = """
-#version 330
-uniform sampler2D screenTexture;
-uniform float pixelSize;
-uniform float screenHeight;
-uniform float screenWidth;
-out vec4 FragColor;
-void main() {
-    vec2 uv = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
-    vec2 pixelatedUV = floor(uv / pixelSize) * pixelSize;
-    FragColor = texture(screenTexture, pixelatedUV);
-}
-"""
-fragment_shader_triangles = """
-#version 330 core
-
-uniform sampler2D screenTexture;
-uniform float pixelSize;
-uniform float screenHeight;
-uniform float screenWidth;
-out vec4 FragColor;
-
-void main() {
-    vec2 uv = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
-    vec2 sliceCoord = floor(uv / pixelSize) * pixelSize;
-    vec2 offset = mod(uv, pixelSize);
-
-    vec4 color1 = texture(screenTexture, sliceCoord);
-    vec4 color2 = texture(screenTexture, sliceCoord + vec2(pixelSize, 0.0));
-    vec4 color3 = texture(screenTexture, sliceCoord + vec2(0.0, pixelSize));
-    vec4 color4 = texture(screenTexture, sliceCoord + vec2(pixelSize, pixelSize));
-
-    vec4 averageColor;
-    if (offset.x + offset.y < pixelSize) {
-        averageColor = (color1 + color2 + color3) / 3.0;
-    } else {
-        averageColor = (color2 + color3 + color4) / 3.0;
-    }
-
-    FragColor = averageColor;
-}
-"""
-
-
-class PixelateShader:
-    def __init__(self, screen_size):
+class BaseShader:
+    def __init__(self, vertex_shader, fragment_shader, screen_size):
         self.screen_size = screen_size
-        self.program = self.create_shader_program(
-            vertex_shader, fragment_shader_triangles
-        )
-        self.pixel_size_location = GL.glGetUniformLocation(self.program, "pixelSize")
+        self.program = self.create_shader_program(vertex_shader, fragment_shader)
+        self.vertex_buffer = self.create_vertex_buffer()
         self.shaderScreenWidth = GL.glGetUniformLocation(self.program, "screenWidth")
         self.shaderScreenHeight = GL.glGetUniformLocation(self.program, "screenHeight")
-        self.vertex_buffer = self.create_vertex_buffer()
         self.texture = self.create_texture(screen_size)
         self.frameBuffer = self.createFrameBuffer()
 
@@ -185,11 +103,14 @@ class PixelateShader:
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, 0)
         return vertex_buffer
 
+    def drawSetup(self):
+        pass
+
     def draw(self):
         GL.glUseProgram(self.program)
+        self.drawSetup()
         GL.glUniform1f(self.shaderScreenWidth, self.screen_size[0])
         GL.glUniform1f(self.shaderScreenHeight, self.screen_size[1])
-        GL.glUniform1f(self.pixel_size_location, 0.025)
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture)
 
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vertex_buffer)

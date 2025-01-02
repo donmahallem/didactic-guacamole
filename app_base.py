@@ -5,7 +5,7 @@ from abc import ABC
 from OpenGL import GL
 from OpenGL.GLU import *
 from constants import KEY_DELTA_T, SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT
-from pixel_shader import PixelateShader
+from shaders import TriangulateShader, PixelateShader
 
 
 class BaseApp(ABC):
