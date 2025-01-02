@@ -61,7 +61,7 @@ void main() {
 }
 """
 
-fragment_shader = """
+fragment_shader_squares = """
 #version 330
 uniform sampler2D screenTexture;
 uniform float pixelSize;
@@ -72,6 +72,35 @@ void main() {
     vec2 uv = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
     vec2 pixelatedUV = floor(uv / pixelSize) * pixelSize;
     FragColor = texture(screenTexture, pixelatedUV);
+}
+"""
+fragment_shader_triangles = """
+#version 330 core
+
+uniform sampler2D screenTexture;
+uniform float pixelSize;
+uniform float screenHeight;
+uniform float screenWidth;
+out vec4 FragColor;
+
+void main() {
+    vec2 uv = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
+    vec2 sliceCoord = floor(uv / pixelSize) * pixelSize;
+    vec2 offset = mod(uv, pixelSize);
+
+    vec4 color1 = texture(screenTexture, sliceCoord);
+    vec4 color2 = texture(screenTexture, sliceCoord + vec2(pixelSize, 0.0));
+    vec4 color3 = texture(screenTexture, sliceCoord + vec2(0.0, pixelSize));
+    vec4 color4 = texture(screenTexture, sliceCoord + vec2(pixelSize, pixelSize));
+
+    vec4 averageColor;
+    if (offset.x + offset.y < pixelSize) {
+        averageColor = (color1 + color2 + color3) / 3.0;
+    } else {
+        averageColor = (color2 + color3 + color4) / 3.0;
+    }
+
+    FragColor = averageColor;
 }
 """
 
@@ -100,7 +129,9 @@ class MovingCircle:
 class PixelateShader:
     def __init__(self, screen_size):
         self.screen_size = screen_size
-        self.program = self.create_shader_program(vertex_shader, fragment_shader)
+        self.program = self.create_shader_program(
+            vertex_shader, fragment_shader_triangles
+        )
         self.pixel_size_location = GL.glGetUniformLocation(self.program, "pixelSize")
         self.shaderScreenWidth = GL.glGetUniformLocation(self.program, "screenWidth")
         self.shaderScreenHeight = GL.glGetUniformLocation(self.program, "screenHeight")
