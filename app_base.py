@@ -5,7 +5,7 @@ from abc import ABC
 from OpenGL import GL
 from OpenGL.GLU import *
 from constants import KEY_DELTA_T, SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT
-from shaders import TriangulateShader, PixelateShader
+from shaders import TriangulateShader, PixelateShader, RectShader
 
 
 class BaseApp(ABC):
@@ -15,6 +15,7 @@ class BaseApp(ABC):
         game_size=(SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT),
     ):
         pygame.init()
+        self.fpsDisplayInterval = 2000
         self.game_size = game_size
         self.screen_size = screen_size
         self.clock = pygame.time.Clock()
@@ -24,7 +25,7 @@ class BaseApp(ABC):
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)
         GL.glMatrixMode(GL.GL_PROJECTION)
         gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
-        self.pixel_shader = PixelateShader(self.screen_size)
+        self.pixel_shader = RectShader(self.screen_size)
 
     def initScreen(self) -> pygame.surface.Surface:
         return pygame.display.set_mode(
@@ -44,6 +45,7 @@ class BaseApp(ABC):
 
     def run(self) -> None:
         running = True
+        fpsTimer = 0
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -53,6 +55,10 @@ class BaseApp(ABC):
             self.basegame.update(**{KEY_DELTA_T: deltaT})
             self.draw()
             self.pixel_shader.draw()
+            fpsTimer += self.clock.get_time()
+            if fpsTimer >= self.fpsDisplayInterval:
+                print(f"FPS: {self.clock.get_fps():.2f}")
+                fpsTimer = 0
 
     def close(self) -> None:
         pygame.quit()
