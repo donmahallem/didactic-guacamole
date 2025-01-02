@@ -105,27 +105,6 @@ void main() {
 """
 
 
-class MovingCircle:
-    def __init__(self, radius, speed):
-        self.radius = radius
-        self.speed = speed
-        self.angle = 0
-
-    def draw(self):
-        GL.glBegin(GL.GL_POLYGON)
-        for i in range(360):
-            theta = 2.0 * math.pi * i / 360
-            x = self.radius * math.cos(theta)
-            y = self.radius * math.sin(theta)
-            GL.glVertex2f(x, y)
-        GL.glEnd()
-
-    def update(self):
-        self.angle += self.speed
-        if self.angle >= 360:
-            self.angle -= 360
-
-
 class PixelateShader:
     def __init__(self, screen_size):
         self.screen_size = screen_size
