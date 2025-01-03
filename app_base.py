@@ -5,7 +5,7 @@ from abc import ABC
 from OpenGL import GL
 from OpenGL.GLU import *
 from constants import KEY_DELTA_T, SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT
-from shaders import TriangulateShader, PixelateShader, RectShader, LightHouseGridShader
+from shaders import TriangulateShader, PixelateShader, RectShader, LightHouseShader
 
 
 class BaseApp(ABC):
@@ -25,7 +25,7 @@ class BaseApp(ABC):
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)
         GL.glMatrixMode(GL.GL_PROJECTION)
         gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
-        self.pixel_shader = LightHouseGridShader(self.screen_size)
+        self.pixel_shader = LightHouseShader(self.screen_size)
 
     def initScreen(self) -> pygame.surface.Surface:
         return pygame.display.set_mode(

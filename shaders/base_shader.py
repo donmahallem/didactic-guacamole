@@ -28,6 +28,7 @@ def create_shader_program(vertex_source, fragment_source):
 
 class BaseShader:
     def __init__(self, vertex_shader, fragment_shader, screen_size):
+        print(f"Creating FBO{screen_size}")
         self.screen_size = screen_size
         self.program = self.create_shader_program(vertex_shader, fragment_shader)
         self.vertex_buffer = self.create_vertex_buffer()

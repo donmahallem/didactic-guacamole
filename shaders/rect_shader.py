@@ -17,12 +17,10 @@ uniform sampler2D screenTexture;
 uniform float sampleOffsetX;
 uniform float sampleOffsetY;
 uniform int numSamples;
-uniform float screenHeight;
-uniform float screenWidth;
 out vec4 FragColor;
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
+    vec2 uv = gl_FragCoord.xy / textureSize(screenTexture,0);
     vec2 sliceCoord = floor(uv / vec2(sampleOffsetX, sampleOffsetY)) * vec2(sampleOffsetX, sampleOffsetY);
 
     vec4 color = vec4(0.0);
