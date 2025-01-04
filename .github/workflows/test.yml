@@ -1,0 +1,11 @@
+name: test-action
+on: [push, pull_request]
+jobs:
+  linter_name:
+    name: runner/test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Check those fine sneks out
+      - name: Fact checking
+        run: python -m unittest discover -p "*_test.py"
