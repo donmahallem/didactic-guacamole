@@ -1,5 +1,5 @@
 from OpenGL import GL
-from constants import SCREEN_BASE_HEIGHT, SCREEN_BASE_WIDTH
+from guacamole.constants import SCREEN_BASE_HEIGHT, SCREEN_BASE_WIDTH
 
 
 VERTEX_BUFFER = 0

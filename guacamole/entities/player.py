@@ -1,13 +1,17 @@
-import pygame
-from circle_sprite import CircleSprite
-from constants import KEY_DELTA_T
+import glm
+from guacamole.constants import KEY_DELTA_T
+from guacamole.util import Rect
+from .circle_sprite import CircleSprite
 
 
 class Player(CircleSprite):
-    def __init__(self, x, y, width, height, play_area: pygame.rect.Rect):
-        super().__init__(x, y, width, height)
-        self.velocity = pygame.math.Vector2(10, 10)
-        self.play_area = play_area
+    def __init__(self, pos: tuple[float], size: tuple[float], play_area: tuple[float]):
+        super().__init__(pos, size)
+        self.velocity = glm.vec2(10, 10)
+        if isinstance(play_area) == Rect:
+            self.playArea = Rect(play_area)
+        else:
+            self.playArea = Rect(play_area[0], play_area[1], play_area[2], play_area[3])
 
     def update(self, *args, **kwargs):
         if KEY_DELTA_T not in kwargs:
@@ -15,9 +19,9 @@ class Player(CircleSprite):
         deltaT = kwargs[KEY_DELTA_T]
         self.center.x += self.velocity.x * deltaT / 1000
         self.center.y += self.velocity.y * deltaT / 1000
-        moveRect = pygame.rect.Rect(
-            self.play_area.topleft + self.radius,
-            self.play_area.bottomright - (2 * self.radius),
+        moveRect = Rect(
+            self.playArea.topLeft + self.radius,
+            self.playArea.bottomRight - (2 * self.radius),
         )
         while not moveRect.collidepoint(self.center):
             if self.center.x < moveRect.left:
