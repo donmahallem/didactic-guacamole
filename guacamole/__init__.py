@@ -1,1 +1,1 @@
-from .app_base import BaseApp
+from guacamole.app_base import BaseApp

@@ -1,4 +1,4 @@
-from .sprite import Sprite
+from guacamole.entities.sprite import Sprite
 import typing
 
 

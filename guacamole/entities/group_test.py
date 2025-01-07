@@ -1,7 +1,7 @@
 import unittest
 import glm
-from .sprite import Sprite
-from .group import Group
+from guacamole.entities.sprite import Sprite
+from guacamole.entities.group import Group
 
 
 class TestGroup(unittest.TestCase):

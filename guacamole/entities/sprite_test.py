@@ -1,6 +1,6 @@
 import unittest
 import glm
-from .sprite import Sprite
+from guacamole.entities.sprite import Sprite
 
 
 class TestSprite(unittest.TestCase):

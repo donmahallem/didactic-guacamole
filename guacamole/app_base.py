@@ -1,10 +1,15 @@
 import sys
-from .base_game import BaseGame
+from guacamole.base_game import BaseGame
 from abc import ABC
 from OpenGL import GL, GLU
 import glfw
 from guacamole.constants import KEY_DELTA_T, SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT
-from .shaders import TriangulateShader, PixelateShader, RectShader, LightHouseShader
+from guacamole.shaders import (
+    TriangulateShader,
+    PixelateShader,
+    RectShader,
+    LightHouseShader,
+)
 
 
 class BaseApp(ABC):

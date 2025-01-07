@@ -1,6 +1,6 @@
 import unittest
 import glm
-from .rect import Rect
+from guacamole.util.rect import Rect
 
 
 class TestCalculations(unittest.TestCase):

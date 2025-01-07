@@ -1,7 +1,7 @@
 import glm
 from guacamole.constants import KEY_DELTA_T
 from guacamole.util import Rect
-from .circle_sprite import CircleSprite
+from guacamole.entities.circle_sprite import CircleSprite
 
 
 class Player(CircleSprite):

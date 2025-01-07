@@ -2,8 +2,8 @@ import glfw
 from OpenGL import GL
 from OpenGL import GLU
 from guacamole.constants import SCREEN_BASE_HEIGHT, SCREEN_BASE_WIDTH, KEY_DELTA_T
-from base_game import BaseGame
-from shaders import LightHouseShader
+from guacamole.base_game import BaseGame
+from guacamole.shaders import LightHouseShader
 
 
 WINDOW_SIZE = (600, int(600 / SCREEN_BASE_WIDTH * SCREEN_BASE_HEIGHT))
