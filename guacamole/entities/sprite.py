@@ -2,10 +2,12 @@
 
 import typing
 
+
 class Sprite:
     """
     Simple sprite class
     """
+
     def __init__(self, parent: typing.Self = None):
         self._parent = parent
 

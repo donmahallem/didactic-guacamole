@@ -4,7 +4,7 @@ import typing
 
 class Group(Sprite):
 
-    def __init__(self,parent:typing.Self=None):
+    def __init__(self, parent: typing.Self = None):
         super().__init__(parent)
         self._items = []
 
@@ -22,13 +22,16 @@ class Group(Sprite):
 
     def __len__(self):
         return len(self._items)
-    def __iadd__(self,other):
+
+    def __iadd__(self, other):
         self.add(other)
         return self
-    def __isub__(self,other):
+
+    def __isub__(self, other):
         self.remove(other)
         return self
-    def __contains__(self,other):
+
+    def __contains__(self, other):
         return other in self._items
 
     @typing.overload
@@ -44,7 +47,7 @@ class Group(Sprite):
             for sprite in sprites:
                 sprite.parent = self
                 self._items.append(sprite)
-        elif isinstance(sprites,Sprite):
+        elif isinstance(sprites, Sprite):
             self._items.add(sprites)
         else:
             raise TypeError(f"{type(sprites)} is not of type Sprite")

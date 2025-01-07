@@ -1,6 +1,7 @@
 [run]
 branch = True
-
+omit =
+    */*_test.py
 [report]
 ; Regexes for lines to exclude from consideration
 exclude_also =

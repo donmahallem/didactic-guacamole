@@ -19,7 +19,7 @@ class Rect:
         if len(args) == 1 and type(args[0]) == Rect:
             self._pos = glm.vec2(args[0].left, args[0].top)
             self._size = glm.vec2(args[0].width, args[0].height)
-        elif len(args) == 2 and len(args[0])==2 and len(args[1]):
+        elif len(args) == 2 and len(args[0]) == 2 and len(args[1]):
             self._pos = glm.vec2(args[0])
             self._size = glm.vec2(args[1])
         elif len(args) == 4:
@@ -29,18 +29,18 @@ class Rect:
             raise SyntaxError(f"Invalid arguments ({args})")
         self.__fixRect()
 
-    def __eq__(self,other:typing.Self):
-        return self._pos==other.topLeft and self._size==other.size
-    
+    def __eq__(self, other: typing.Self):
+        return self._pos == other.topLeft and self._size == other.size
+
     @property
     def center(self) -> glm.vec2:
         return self._pos + (0.5 * self._size)
 
     @center.setter
-    def center(self, value: glm.vec2|tuple[float,float]):
-        if isinstance(value,glm.vec2):
+    def center(self, value: glm.vec2 | tuple[float, float]):
+        if isinstance(value, glm.vec2):
             offset = value - self._pos - (0.5 * self._size)
-        elif isinstance(value,tuple) and len(value)==2:
+        elif isinstance(value, tuple) and len(value) == 2:
             offset = value - self._pos - (0.5 * self._size)
         else:
             raise ValueError("Invalid type", type(value))
@@ -114,7 +114,7 @@ class Rect:
         return Rect((left, top), (right - left, bottom - top))
 
     def __add__(self, vec):
-        if isinstance(vec,glm.vec2):
+        if isinstance(vec, glm.vec2):
             return Rect(self.topLeft + vec, self.size)
         raise ValueError(f"Invalid type {type(vec)} provided")
 

@@ -1,7 +1,5 @@
-from pygame.locals import *
 from OpenGL import GL
 from .base_shader import BaseShader
-import numpy as np
 from guacamole.constants import (
     PIXEL_NUM_HORIZONTAL,
     PIXEL_NUM_VERTICAL,

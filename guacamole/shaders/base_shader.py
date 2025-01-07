@@ -1,4 +1,3 @@
-from pygame.locals import *
 from OpenGL import GL
 import numpy as np
 

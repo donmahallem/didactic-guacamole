@@ -1,5 +1,4 @@
 import glfw
-import pygame
 from OpenGL import GL
 from OpenGL import GLU
 from guacamole.constants import SCREEN_BASE_HEIGHT, SCREEN_BASE_WIDTH, KEY_DELTA_T
@@ -45,9 +44,6 @@ def create_fbo(width, height):
     return fbo, texture
 
 
-clock = pygame.time.Clock()
-
-
 def main():
     # Initialize the library
     if not glfw.init():
@@ -83,7 +79,7 @@ def main():
         window2
     ):
         # Render here, e.g. using pyOpenGL
-        deltaT = clock.tick()
+        # deltaT = clock.tick()
         GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, fbo)
         # GL.glViewport(0, 0, 800, 600)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
@@ -133,7 +129,3 @@ def main():
         glfw.poll_events()
 
     glfw.terminate()
-
-
-if __name__ == "__main__":
-    main()

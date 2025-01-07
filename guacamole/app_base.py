@@ -1,4 +1,3 @@
-import pygame
 import sys
 from .base_game import BaseGame
 from abc import ABC
@@ -19,7 +18,6 @@ class BaseApp(ABC):
         self.fpsDisplayInterval = 2
         self.game_size = (int(game_size[0]), int(game_size[1]))
         self.screen_size = (int(screen_size[0]), int(screen_size[1]))
-        self.clock = pygame.time.Clock()
         self.window1 = glfw.create_window(
             self.screen_size[0], self.screen_size[1], "Didactic Guacamole", None, None
         )
@@ -63,5 +61,4 @@ class BaseApp(ABC):
             glfw.poll_events()
 
     def close(self) -> None:
-        pygame.quit()
         sys.exit()
