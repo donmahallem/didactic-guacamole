@@ -8,7 +8,7 @@ class Player(CircleSprite):
     def __init__(self, pos: tuple[float], size: tuple[float], play_area: tuple[float]):
         super().__init__(pos, size)
         self.velocity = glm.vec2(10, 10)
-        if isinstance(play_area) == Rect:
+        if isinstance(play_area, Rect):
             self.playArea = Rect(play_area)
         else:
             self.playArea = Rect(play_area[0], play_area[1], play_area[2], play_area[3])
