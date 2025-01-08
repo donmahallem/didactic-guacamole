@@ -10,6 +10,7 @@ from guacamole.shaders import (
     RectShader,
     LightHouseShader,
 )
+from guacamole.fps_counter import FPSCounter
 
 
 class BaseApp(ABC):
@@ -20,7 +21,6 @@ class BaseApp(ABC):
     ):
         if not glfw.init():
             raise Exception("GLFW can't be initialized")
-        self.fpsDisplayInterval = 2
         self.game_size = (int(game_size[0]), int(game_size[1]))
         self.screen_size = (int(screen_size[0]), int(screen_size[1]))
         self.window1 = glfw.create_window(
@@ -30,11 +30,13 @@ class BaseApp(ABC):
             glfw.terminate()
             raise Exception("GLFW window can't be created")
         glfw.make_context_current(self.window1)
+        glfw.set_key_callback(self.window1, self.onKeyboardInput)
         self.basegame = self.initGame()
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GLU.gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
         self.pixel_shader = LightHouseShader(self.screen_size)
+        self.fpsCounter = FPSCounter()
 
     def initGame(self) -> BaseGame:
         return BaseGame(self.game_size[0], self.game_size[0])
@@ -48,22 +50,15 @@ class BaseApp(ABC):
         glfw.swap_buffers(self.window1)
 
     def run(self) -> None:
-        running = True
-        lastTime = glfw.get_time()
-        fpsTimer = 0
         while not glfw.window_should_close(self.window1):
-            timeNow = glfw.get_time()
-            deltaT = timeNow - lastTime
-            # print(glfw.get_time(),fpsTimer)
+            deltaT = self.fpsCounter.tick()
             self.basegame.update(**{KEY_DELTA_T: deltaT})
             self.draw()
             # self.pixel_shader.draw()
-            fpsTimer += deltaT
-            if fpsTimer >= self.fpsDisplayInterval:
-                print(f"FPS: {1/deltaT:.2f}")
-                fpsTimer = 0
-            lastTime = timeNow
             glfw.poll_events()
+
+    def onKeyboardInput(self, window, key: int, scancode: int, action: int, mods: int):
+        print(key, scancode, action, mods)
 
     def close(self) -> None:
         sys.exit()
