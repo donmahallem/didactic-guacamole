@@ -1,4 +1,3 @@
-from pygame.locals import *
 from OpenGL import GL
 from .base_shader import BaseShader
 
