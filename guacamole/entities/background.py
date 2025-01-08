@@ -1,6 +1,3 @@
-import os
-import OpenGL
-OpenGL.USE_ACCELERATE = False
 from OpenGL import GL
 from guacamole.constants import SCREEN_BASE_HEIGHT, SCREEN_BASE_WIDTH
 from .sprite import Sprite
