@@ -1,17 +1,17 @@
 import os
 import OpenGL
 
-if os.environ.get("TEST_NO_ACCELERATE"):
+if os.environ.get("TEST_NO_GPU"):
     OpenGL.USE_ACCELERATE = False
 from OpenGL import GL
 from guacamole.constants import SCREEN_BASE_HEIGHT, SCREEN_BASE_WIDTH
-
+from .sprite import Sprite
 
 VERTEX_BUFFER = 0
 COLOR_BUFFER = 1
 
 
-class GradientBackground:
+class GradientBackground(Sprite):
     def __init__(self, size=(SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT)):
         self._size = size
 
