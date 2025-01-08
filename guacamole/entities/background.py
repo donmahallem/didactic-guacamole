@@ -1,8 +1,6 @@
 import os
 import OpenGL
-
-if os.environ.get("TEST_NO_GPU"):
-    OpenGL.USE_ACCELERATE = False
+OpenGL.USE_ACCELERATE = False
 from OpenGL import GL
 from guacamole.constants import SCREEN_BASE_HEIGHT, SCREEN_BASE_WIDTH
 from .sprite import Sprite
