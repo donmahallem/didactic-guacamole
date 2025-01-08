@@ -3,7 +3,7 @@ import collections
 import statistics
 
 
-class FPSCounter:
+class Timer:
     def __init__(self, debounceTime: float = 2, fpsBufferSize: int = 100):
         self._debounceTime = debounceTime
         self._lastTick = None

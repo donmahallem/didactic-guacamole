@@ -10,7 +10,7 @@ from guacamole.shaders import (
     RectShader,
     LightHouseShader,
 )
-from guacamole.fps_counter import FPSCounter
+from guacamole.fps_counter import Timer
 
 
 class BaseApp(ABC):
@@ -36,7 +36,7 @@ class BaseApp(ABC):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GLU.gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
         self.pixel_shader = LightHouseShader(self.screen_size)
-        self.fpsCounter = FPSCounter()
+        self.fpsCounter = Timer()
 
     def initGame(self) -> BaseGame:
         return BaseGame(self.game_size[0], self.game_size[0])
