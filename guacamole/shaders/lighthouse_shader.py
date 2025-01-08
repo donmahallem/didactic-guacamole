@@ -118,7 +118,7 @@ class LightHouseShader(BaseShader):
 
     def drawSetup(self):
         GL.glUniform2f(self.shaderResolution, self.screen_size[0], self.screen_size[1])
-        GL.glUniform2f(self.shadernumSamples, 8.0, 8.0)
+        GL.glUniform2f(self.shadernumSamples, 16.0, 16.0)
         GL.glUniform2f(
             self.shaderCellCount, PIXEL_NUM_HORIZONTAL * 1.0, PIXEL_NUM_VERTICAL * 1.0
         )

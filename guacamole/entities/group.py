@@ -6,15 +6,15 @@ class Group(Sprite):
 
     def __init__(self, parent: typing.Self = None):
         super().__init__(parent)
-        self._items = []
+        self._items: Sprite | typing.Self = []
 
     def draw(self):
         for item in self._items:
             item.draw()
 
-    def update(self, **kwargs):
+    def update(self, *args, **kwargs):
         for item in self._items:
-            item.update(*kwargs)
+            item.update(*args, **kwargs)
 
     def remove(self, item):
         if item in self._items:

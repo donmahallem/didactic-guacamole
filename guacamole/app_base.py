@@ -57,7 +57,7 @@ class BaseApp(ABC):
             # print(glfw.get_time(),fpsTimer)
             self.basegame.update(**{KEY_DELTA_T: deltaT})
             self.draw()
-            self.pixel_shader.draw()
+            # self.pixel_shader.draw()
             fpsTimer += deltaT
             if fpsTimer >= self.fpsDisplayInterval:
                 print(f"FPS: {1/deltaT:.2f}")
