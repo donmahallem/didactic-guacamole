@@ -2,8 +2,14 @@ import sys
 from guacamole.base_game import BaseGame
 from abc import ABC
 from OpenGL import GL, GLU
+import glm
 import glfw
-from guacamole.constants import KEY_DELTA_T, SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT
+from guacamole.constants import (
+    KEY_DELTA_T,
+    SCREEN_BASE_WIDTH,
+    SCREEN_BASE_HEIGHT,
+    KEY_MOUSE_POS,
+)
 from guacamole.shaders import (
     TriangulateShader,
     PixelateShader,
@@ -29,7 +35,9 @@ class BaseApp(ABC):
         if not self.window1:
             glfw.terminate()
             raise Exception("GLFW window can't be created")
+        glfw.set_window_aspect_ratio(self.window1, self.game_size[0], self.game_size[1])
         glfw.make_context_current(self.window1)
+        glfw.set_window_size_callback(self.window1, self.onWindowResize)
         glfw.set_key_callback(self.window1, self.onKeyboardInput)
         self.basegame = self.initGame()
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -42,20 +50,25 @@ class BaseApp(ABC):
         return BaseGame(self.game_size[0], self.game_size[0])
 
     def draw(self) -> None:
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.pixel_shader.frameBuffer)
+        # GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.pixel_shader.frameBuffer)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
         self.basegame.draw()
-        GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
-        self.pixel_shader.draw()
+        # GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
+        # self.pixel_shader.draw()
         glfw.swap_buffers(self.window1)
 
     def run(self) -> None:
         while not glfw.window_should_close(self.window1):
             deltaT = self.fpsCounter.tick()
-            self.basegame.update(**{KEY_DELTA_T: deltaT})
+            mouse_pos = glm.vec2(glfw.get_cursor_pos(self.window1))
+            mouse_pos /= self.screen_size
+            self.basegame.update(**{KEY_DELTA_T: deltaT, KEY_MOUSE_POS: mouse_pos})
             self.draw()
             # self.pixel_shader.draw()
             glfw.poll_events()
+
+    def onWindowResize(self, window, width, height) -> None:
+        GL.glViewport(0, 0, width, height)
 
     def onKeyboardInput(self, window, key: int, scancode: int, action: int, mods: int):
         print(key, scancode, action, mods)

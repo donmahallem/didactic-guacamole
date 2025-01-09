@@ -1,6 +1,7 @@
 from typing import Final
 
 KEY_DELTA_T: Final[str] = "deltaT"
+KEY_MOUSE_POS: Final[str] = "mousePos"
 
 PIXEL_NUM_HORIZONTAL: Final[int] = 28
 PIXEL_NUM_VERTICAL: Final[int] = 14

@@ -2,6 +2,7 @@ from guacamole.entities import Player, GradientBackground
 from guacamole.constants import PIXEL_SIZE_HORIZONTAL, PIXEL_SIZE_VERTICAL
 from guacamole.util import Rect
 from guacamole.entities.group import Group
+import glfw
 
 
 class BaseGame(Group):
@@ -13,9 +14,9 @@ class BaseGame(Group):
             (50, 75), (player_size, player_size), Rect(0, 0, width, height)
         )
         self.background = GradientBackground()
+        self.add(self.background)
         self.add(self.player)
         self.player.velocity = (8000, 450)
 
-    def draw(self):
-        self.background.draw()
-        self.player.draw()
+    def update(self, *args, **kwargs) -> None:
+        super().update(*args, **kwargs)
