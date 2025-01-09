@@ -16,27 +16,42 @@ uniform vec2 mousePosition;
 uniform vec2 resolution;
 
 out vec2 TexCoords;
+out vec3 pos;
 
 void main()
 {{
     gl_Position = vec4(aPos, 1.0); // see how we directly give a vec3 to vec4's constructor
     TexCoords = aTexCoord;
+    pos=aPos*0.5+0.5;
+    pos.x=1-pos.x;
 }}
 """
 fragment_shader = f"""
 #version 330 core
 out vec4 FragColor;
 in vec2 TexCoords;
+in vec3 pos;
 
 uniform vec2 mousePosition;
 uniform vec2 resolution;
 
 void main()
 {{
-    vec2 uv = mousePosition / resolution;
-    float red = fract(TexCoords.x+mousePosition.x);///resolution.x;
-    float green = fract(TexCoords.y+mousePosition.y);///resolution.y;
-    FragColor = vec4(red,green, 0.0, 1.0);
+    vec2 uv = TexCoords;
+    float red = pos.x+mousePosition.x;
+    float green = pos.y+mousePosition.y;
+    if(mod(red,2)>=1){{
+        red=1-fract(red);
+    }}else{{
+        red=fract(red);
+    }}
+    if(mod(green,2)>=1){{
+        green=1-fract(green);
+    }}else{{
+        green=fract(green);
+    }}
+    float blue = 1.0-max(red,green);
+    FragColor = vec4(red,green, blue, 1.0);
 }} 
 """
 
