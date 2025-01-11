@@ -2,6 +2,7 @@ import numpy as np
 import random
 from .quack_obstacle import QuackObstacle, QuackObstacleType
 from .quack_band import QuackBand, QuackBandType
+from guacamole.constants import KEY_DELTA_T, KEY_RESET_GAME
 
 
 class QuackGame:
@@ -9,9 +10,12 @@ class QuackGame:
         self._parent = None
         self._obstacleBands = dict()
         self._lastSeed = None
+        self._maxPlaytime = 10
+        self._playTime = 0
 
     def resetGame(self, seed: float | int | str = random.random()) -> None:
         self._lastSeed = hash(seed)
+        self._playTime = 0
         rnd = np.random.default_rng(self._lastSeed)
         self._obstacleBands.clear()
         for bandNum in range(13):
@@ -57,6 +61,25 @@ class QuackGame:
 
     def getBands(self) -> dict[QuackBand]:
         return self._obstacleBands
+
+    @property
+    def playTime(self) -> float:
+        return self._maxPlaytime
+
+    @playTime.setter
+    def playTime(self, playtime: float) -> None:
+        if playtime > 0:
+            self._maxPlaytime = playtime
+            return
+        raise ValueError("Playtime must be greater than 0")
+
+    def update(self, *args, **kwargs) -> None:
+        if KEY_RESET_GAME in kwargs:
+            self.resetGame()
+            return
+        if KEY_DELTA_T not in kwargs:
+            return
+        self._playTime += kwargs[KEY_DELTA_T]
 
     @property
     def lastSeed(self):
