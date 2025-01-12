@@ -62,15 +62,12 @@ class DotsEntity(Sprite):
             GL.glColor3f(1.0, 0.0, 1.0)
         GL.glPushMatrix()
         GL.glTranslatef(self.position.x, self.position.y, self.position.z)
+        GL.glScalef(self._size.x,self._size.y,0)
         GL.glBegin(GL.GL_QUADS)
-        # GL.glColor3f(1.0, 0.0, 0.0)  # Red
         GL.glVertex2f(0, 0)
-        # GL.glColor3f(0.0, 1.0, 0.0)  # Green
-        GL.glVertex2f(self._size.x, 0)
-        # GL.glColor3f(0.0, 0.0, 1.0)  # Blue
-        GL.glVertex2f(self._size.x, self._size.y)
-        # GL.glColor3f(1.0, 1.0, 0.0)  # Yellow
-        GL.glVertex2f(0, self._size.y)
+        GL.glVertex2f(1, 0)
+        GL.glVertex2f(1, 1)
+        GL.glVertex2f(0, 1)
         GL.glEnd()
         GL.glPopMatrix()
 
