@@ -62,7 +62,7 @@ class DotsEntity(Sprite):
             GL.glColor3f(1.0, 0.0, 1.0)
         GL.glPushMatrix()
         GL.glTranslatef(self.position.x, self.position.y, self.position.z)
-        GL.glScalef(self._size.x,self._size.y,0)
+        GL.glScalef(self._size.x, self._size.y, 0)
         GL.glBegin(GL.GL_QUADS)
         GL.glVertex2f(0, 0)
         GL.glVertex2f(1, 0)
