@@ -100,19 +100,16 @@ class DotsGame:
         if selected is None or len(selected) < self._groupMinSize:
             return
         minX = self._size[1] + 1
-        maxX = -1
         for dot in selected:
             self._field[dot[0], dot[1]] = 0
             minX = min(minX, dot[1])
-            maxX = max(maxX, dot[1])
-        return len(selected), self.applyGravity(minX, maxX)
+        return len(selected), self.applyGravity(minX)
 
-    def applyGravity(self, l=None, r=None):
+    def applyGravity(self, l=None):
         left = l if l else 0
-        right = r if r else self._size[0] - 1
         moved = set()
         offsetX = 0
-        for x in range(left, right + 1):
+        for x in range(left, self._size[0]):
             offsetY = 0
             for y in range(self._size[1]):
                 if self._field[y, x] == 0:
