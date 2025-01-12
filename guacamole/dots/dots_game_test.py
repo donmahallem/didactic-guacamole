@@ -54,26 +54,52 @@ class TestDotsGame(unittest.TestCase):
         )
         self.assertEqual(r.score, 6)
 
-    def test_applyGravity(self):
+    def test_applyGravity_no_change(self):
         r = DotsGame()
         testField = [[2, 2, 2], [1, 0, 1], [0, 0, 0], [0, 0, 0]]
-        testField2 = [[2, 2, 2], [1, 0, 1], [0, 0, 0], [1, 2, 3]]
-        testField3 = [[2, 0, 2], [1, 0, 0], [0, 0, 0], [1, 0, 3]]
         r.field = testField
         moved = r.applyGravity()
         np.testing.assert_equal(r.field, testField)
         self.assertIsNone(moved)
+
+    def test_applyGravity_vertical(self):
+        r = DotsGame()
+        testField2 = [[2, 2, 2], [1, 0, 1], [0, 0, 0], [1, 2, 3]]
         r.field = testField2
         moved = r.applyGravity()
         np.testing.assert_equal(r.field, [[2, 2, 2], [1, 2, 1], [1, 0, 3], [0, 0, 0]])
         self.assertSetEqual(
             moved, set([((3, 0), (2, 0), 1), ((3, 1), (1, 1), 2), ((3, 2), (2, 2), 3)])
         )
+
+    def test_applyGravity_horizontal(self):
+        r = DotsGame()
+        testField3 = [[2, 0, 2], [1, 0, 3], [1, 0, 0]]
+        r.field = testField3
+        moved = r.applyGravity()
+        np.testing.assert_equal(r.field, [[2, 2, 0], [1, 3, 0], [1, 0, 0]])
+        self.assertSetEqual(moved, set([((0, 2), (0, 1), 2), ((1, 2), (1, 1), 3)]))
+
+    def test_applyGravity_diagonal_simple(self):
+        r = DotsGame()
+        testField3 = [[2, 0, 2], [1, 0, 0], [0, 0, 0], [1, 0, 3]]
         r.field = testField3
         moved = r.applyGravity()
         np.testing.assert_equal(r.field, [[2, 2, 0], [1, 3, 0], [1, 0, 0], [0, 0, 0]])
         self.assertSetEqual(
             moved, set([((0, 2), (0, 1), 2), ((3, 2), (1, 1), 3), ((3, 0), (2, 0), 1)])
+        )
+
+    def test_applyGravity_diagonal_space_tile_space(self):
+        r = DotsGame()
+        testField3 = [[2, 0, 2, 0, 3], [1, 0, 0, 0, 0], [0, 0, 0, 0, 4]]
+        r.field = testField3
+        moved = r.applyGravity()
+        np.testing.assert_equal(
+            r.field, [[2, 2, 3, 0, 0], [1, 0, 4, 0, 0], [0, 0, 0, 0, 0]]
+        )
+        self.assertSetEqual(
+            moved, set([((0, 4), (0, 2), 3), ((0, 2), (0, 1), 2), ((2, 4), (1, 2), 4)])
         )
 
     def test_isFinished(self):
