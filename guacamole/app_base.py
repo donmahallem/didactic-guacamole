@@ -10,6 +10,11 @@ from guacamole.constants import (
     SCREEN_BASE_HEIGHT,
     KEY_MOUSE_POS,
     KEY_CLICKED_AT,
+    KEY_MOVE_BOTTOM,
+    KEY_MOVE_TOP,
+    KEY_MOVE_LEFT,
+    KEY_MOVE_RIGHT,
+    KEY_SELECT,
 )
 from guacamole.shaders import (
     TriangulateShader,
@@ -90,7 +95,17 @@ class BaseApp(ABC):
         GL.glViewport(0, 0, width, height)
 
     def onKeyboardInput(self, window, key: int, scancode: int, action: int, mods: int):
-        print(key, scancode, action, mods)
+        print(key)
+        if key == glfw.KEY_A and action == glfw.PRESS:
+            self._messagQueue.append((KEY_MOVE_LEFT, True))
+        elif key == glfw.KEY_S and action == glfw.PRESS:
+            self._messagQueue.append((KEY_MOVE_BOTTOM, True))
+        elif key == glfw.KEY_D and action == glfw.PRESS:
+            self._messagQueue.append((KEY_MOVE_RIGHT, True))
+        elif key == glfw.KEY_W and action == glfw.PRESS:
+            self._messagQueue.append((KEY_MOVE_TOP, True))
+        elif key == glfw.KEY_SPACE and action == glfw.PRESS:
+            self._messagQueue.append((KEY_SELECT, True))
 
     def onMouseButton(self, window, key: int, action: int, mods: int):
         if key == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:

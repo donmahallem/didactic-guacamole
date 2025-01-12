@@ -4,6 +4,12 @@ KEY_DELTA_T: Final[str] = "deltaT"
 KEY_MOUSE_POS: Final[str] = "mousePos"
 KEY_RESET_GAME: Final[str] = "resetGame"
 KEY_CLICKED_AT: Final[str] = "clickedAt"
+KEY_MOVE_LEFT: Final[str] = "moveLeft"
+KEY_MOVE_RIGHT: Final[str] = "moveRight"
+KEY_MOVE_TOP: Final[str] = "moveTop"
+KEY_MOVE_BOTTOM: Final[str] = "moveBottom"
+KEY_SELECT: Final[str] = "select"
+
 
 PIXEL_NUM_HORIZONTAL: Final[int] = 28
 PIXEL_NUM_VERTICAL: Final[int] = 14

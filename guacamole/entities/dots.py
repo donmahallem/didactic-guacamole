@@ -13,17 +13,107 @@ from guacamole.constants import (
     PIXEL_SPACING_VERTICAL,
     SCREEN_BASE_HEIGHT,
     SCREEN_BASE_WIDTH,
+    KEY_MOVE_BOTTOM,
+    KEY_MOVE_TOP,
+    KEY_MOVE_LEFT,
+    KEY_MOVE_RIGHT,
+    KEY_SELECT,
 )
 import random
 import glm
 from typing import Final
 from .animation import EaseInQuadAnimation, Animation
+import math
 
 SPACING_VEC: Final[glm.vec2] = glm.vec2(
     PIXEL_SPACING_HORIZONTAL, PIXEL_SPACING_VERTICAL
 )
 PIXEL_VEC: Final[glm.vec2] = glm.vec2(PIXEL_SIZE_HORIZONTAL, PIXEL_SIZE_VERTICAL)
 SCREEN_SIZE_VEC: Final[glm.vec2] = glm.vec2(SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT)
+
+
+class CursorEntity(Sprite):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._size = glm.vec2(1)
+        self._animator: Animation = EaseInQuadAnimation(0.3)
+        self._animationOffset: glm.vec2 = glm.vec2(0)
+        self._animationTimer = 0
+        self._gamePosition = glm.vec2(0)
+
+    @property
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, s):
+        self._size.xy = s
+
+    @property
+    def gamePosition(self):
+        return self._gamePosition
+
+    @gamePosition.setter
+    def gamePosition(self, val):
+        offset = val - self._gamePosition
+        self._gamePosition.xy = val
+        if self._gamePosition.x < 0:
+            self._gamePosition.x = 0
+        elif self._gamePosition.x >= 28:
+            self._gamePosition.x = 27
+        if self._gamePosition.y < 0:
+            self._gamePosition.y = 0
+        elif self._gamePosition.y >= 14:
+            self._gamePosition.y = 13
+        self.position.xy = self._gamePosition * (PIXEL_VEC + SPACING_VEC)
+        self._animationOffset.xy = offset
+        self._animator.reset()
+        print(self._gamePosition, self.position)
+
+    def animateFrom(self, pos: glm.vec2 | tuple[float, float]) -> None:
+        self._animationOffset = pos - self.position.xy
+        print(pos, self.position, self._animationOffset)
+        self._animator.reset()
+
+    def draw(self):
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+        GL.glColor4f(1.0, 1.0, 1.0, (1 + math.sin(self._animationTimer)) * 0.5 + 0.1)
+        GL.glPushMatrix()
+        if self._animator.done:
+            GL.glTranslatef(self.position.x, self.position.y, self.position.z)
+        else:
+            GL.glTranslatef(
+                self.position.x
+                + ((1 - self._animator.progress) * self._animationOffset.x),
+                self.position.y
+                + ((1 - self._animator.progress) * self._animationOffset.y),
+                self.position.z,
+            )
+        GL.glScalef(self._size.x, self._size.y, 0)
+        GL.glBegin(GL.GL_QUADS)
+        GL.glVertex2f(0, 0)
+        GL.glVertex2f(1, 0)
+        GL.glVertex2f(1, 1)
+        GL.glVertex2f(0, 1)
+        GL.glEnd()
+        GL.glPopMatrix()
+        GL.glDisable(GL.GL_BLEND)
+
+    def update(self, **kwargs) -> None:
+        super().update(**kwargs)
+        if KEY_DELTA_T in kwargs:
+            if not self._animator.done:
+                self._animator.update(kwargs[KEY_DELTA_T])
+            self._animationTimer += kwargs[KEY_DELTA_T] * 10
+        if KEY_MOVE_LEFT in kwargs:
+            self.gamePosition += (-1, 0)
+        if KEY_MOVE_RIGHT in kwargs:
+            self.gamePosition += (1, 0)
+        if KEY_MOVE_TOP in kwargs:
+            self.gamePosition += (0, 1)
+        if KEY_MOVE_BOTTOM in kwargs:
+            self.gamePosition += (0, -1)
 
 
 class DotsEntity(Sprite):
@@ -108,6 +198,10 @@ class DotsGameEntity(Group):
         self._map: dict[(int, int), DotsEntity] = dict()
         self._game.reset(292)
         self.updateMatrix()
+        self._cursor = CursorEntity()
+        self.add(self._cursor)
+        self._cursor.gamePosition = (2, 2)
+        self._cursor.size = PIXEL_VEC
 
     def updateMatrix(self):
         for y in range(self._game.size[1]):
@@ -132,7 +226,7 @@ class DotsGameEntity(Group):
 
         print("Game contains", len(self))
 
-    def clickedAt(self, coords) -> None:
+    def clickedAtRelative(self, coords) -> None:
         cellOffset = PIXEL_VEC + SPACING_VEC
         totalSize = cellOffset * self._game.size
         translatedCoord = coords * SCREEN_SIZE_VEC
@@ -143,16 +237,19 @@ class DotsGameEntity(Group):
             return
         else:
             translatedCoord = translatedCoord // 1
-            print(f"Clicked at cell: {translatedCoord}")
-            res = self._game.dropDotsAt(translatedCoord)
-            if res:
-                # only update on change
-                self.updateMatrix()
-                for moveFrom, moveTo, _ in res[1]:
-                    print(moveFrom, moveTo)
-                    self._map[moveTo].animateFrom(
-                        (SPACING_VEC + PIXEL_VEC) * (moveFrom[1], moveFrom[0])
-                    )
+            self.clickedAt(translatedCoord)
+
+    def clickedAt(self, translatedCoord) -> None:
+        print(f"Clicked at cell: {translatedCoord}")
+        res = self._game.dropDotsAt(translatedCoord)
+        if res:
+            # only update on change
+            self.updateMatrix()
+            for moveFrom, moveTo, _ in res[1]:
+                print(moveFrom, moveTo)
+                self._map[moveTo].animateFrom(
+                    (SPACING_VEC + PIXEL_VEC) * (moveFrom[1], moveFrom[0])
+                )
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
@@ -161,4 +258,6 @@ class DotsGameEntity(Group):
             self.updateMatrix()
             return
         if KEY_CLICKED_AT in kwargs:
-            self.clickedAt(kwargs[KEY_CLICKED_AT])
+            self.clickedAtRelative(kwargs[KEY_CLICKED_AT])
+        if KEY_SELECT in kwargs:
+            self.clickedAt(self._cursor.gamePosition)
