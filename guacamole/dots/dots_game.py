@@ -123,7 +123,7 @@ class DotsGame:
                     self._field[y, x] = 0
             if self._field[0, x + offsetX] == 0:
                 offsetX -= 1
-        return moved if len(moved) else None
+        return moved
 
     def isFinished(self):
         for x in range(self._size[1] - 1):

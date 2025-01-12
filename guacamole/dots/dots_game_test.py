@@ -60,7 +60,8 @@ class TestDotsGame(unittest.TestCase):
         r.field = testField
         moved = r.applyGravity()
         np.testing.assert_equal(r.field, testField)
-        self.assertIsNone(moved)
+        self.assertIsInstance(moved, set)
+        self.assertEqual(len(moved), 0)
 
     def test_applyGravity_vertical(self):
         r = DotsGame()

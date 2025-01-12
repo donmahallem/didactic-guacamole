@@ -17,6 +17,7 @@ from guacamole.constants import (
 import random
 import glm
 from typing import Final
+from .animation import EaseInQuadAnimation, Animation
 
 SPACING_VEC: Final[glm.vec2] = glm.vec2(
     PIXEL_SPACING_HORIZONTAL, PIXEL_SPACING_VERTICAL
@@ -30,6 +31,8 @@ class DotsEntity(Sprite):
         super().__init__(parent)
         self._color = color
         self._size = glm.vec2(1)
+        self._animator: Animation = EaseInQuadAnimation(0.3)
+        self._animationOffset: glm.vec2 = glm.vec2(0)
 
     @property
     def size(self):
@@ -47,6 +50,11 @@ class DotsEntity(Sprite):
     def color(self, c):
         self._color = c
 
+    def animateFrom(self, pos: glm.vec2 | tuple[float, float]) -> None:
+        self._animationOffset = pos - self.position.xy
+        print(pos, self.position, self._animationOffset)
+        self._animator.reset()
+
     def draw(self):
         if self._color == 1:
             GL.glColor3f(1.0, 0.0, 0.0)
@@ -61,7 +69,16 @@ class DotsEntity(Sprite):
         elif self._color == 6:
             GL.glColor3f(1.0, 0.0, 1.0)
         GL.glPushMatrix()
-        GL.glTranslatef(self.position.x, self.position.y, self.position.z)
+        if self._animator.done:
+            GL.glTranslatef(self.position.x, self.position.y, self.position.z)
+        else:
+            GL.glTranslatef(
+                self.position.x
+                + ((1 - self._animator.progress) * self._animationOffset.x),
+                self.position.y
+                + ((1 - self._animator.progress) * self._animationOffset.y),
+                self.position.z,
+            )
         GL.glScalef(self._size.x, self._size.y, 0)
         GL.glBegin(GL.GL_QUADS)
         GL.glVertex2f(0, 0)
@@ -71,6 +88,11 @@ class DotsEntity(Sprite):
         GL.glEnd()
         GL.glPopMatrix()
 
+    def update(self, **kwargs) -> None:
+        super().update(**kwargs)
+        if KEY_DELTA_T in kwargs and not self._animator.done:
+            self._animator.update(kwargs[KEY_DELTA_T])
+
 
 class DotsPool(Pool[DotsEntity]):
 
@@ -79,11 +101,11 @@ class DotsPool(Pool[DotsEntity]):
 
 
 class DotsGameEntity(Group):
-    def __init__(self, colors=3, size=(28, 14), parent=None):
+    def __init__(self, colors=3, size=(28, 14), parent: Group = None):
         super().__init__(parent)
-        self._game = DotsGame(colors, size)
-        self._dotsPool = DotsPool()
-        self._map = dict()
+        self._game: DotsGame = DotsGame(colors, size)
+        self._dotsPool: DotsPool = DotsPool()
+        self._map: dict[(int, int), DotsEntity] = dict()
         self._game.reset(292)
         self.updateMatrix()
 
@@ -126,7 +148,11 @@ class DotsGameEntity(Group):
             if res:
                 # only update on change
                 self.updateMatrix()
-                print(res)
+                for moveFrom, moveTo, _ in res[1]:
+                    print(moveFrom, moveTo)
+                    self._map[moveTo].animateFrom(
+                        (SPACING_VEC + PIXEL_VEC) * (moveFrom[1], moveFrom[0])
+                    )
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
