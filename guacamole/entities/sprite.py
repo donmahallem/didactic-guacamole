@@ -1,6 +1,7 @@
 """Sample Sprite"""
 
 import typing
+import glm
 
 
 class Sprite:
@@ -10,6 +11,36 @@ class Sprite:
 
     def __init__(self, parent: typing.Self = None):
         self._parent = parent
+        self._position = glm.vec3(0)
+
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, v):
+        if isinstance(v, glm.vec3):
+            self._position = glm.vec3(v)
+        elif isinstance(v, glm.vec2):
+            self._position.xy = v
+        elif isinstance(v, tuple) and len(v) == 2:
+            self._position.xy = v
+        elif isinstance(v, tuple) and len(v) == 3:
+            self._position.xyz = v
+        else:
+            raise ValueError(f"Invalid type provided: {type(v)}")
+
+    @property
+    def x(self):
+        return self._position.x
+
+    @property
+    def y(self):
+        return self._position.y
+
+    @property
+    def z(self):
+        return self._position.z
 
     def draw(self):
         """Draw function"""

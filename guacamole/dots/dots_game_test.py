@@ -58,6 +58,7 @@ class TestDotsGame(unittest.TestCase):
         r = DotsGame()
         testField = [[2, 2, 2], [1, 0, 1], [0, 0, 0], [0, 0, 0]]
         testField2 = [[2, 2, 2], [1, 0, 1], [0, 0, 0], [1, 2, 3]]
+        testField3 = [[2, 0, 2], [1, 0, 0], [0, 0, 0], [1, 0, 3]]
         r.field = testField
         moved = r.applyGravity()
         np.testing.assert_equal(r.field, testField)
@@ -68,6 +69,12 @@ class TestDotsGame(unittest.TestCase):
         self.assertSetEqual(
             moved, set([((3, 0), (2, 0), 1), ((3, 1), (1, 1), 2), ((3, 2), (2, 2), 3)])
         )
+        r.field = testField3
+        moved = r.applyGravity()
+        np.testing.assert_equal(r.field, [[2, 2, 0], [1, 3, 0], [1, 0, 0], [0, 0, 0]])
+        self.assertSetEqual(
+            moved, set([((0, 2), (0, 1), 2), ((3, 2), (1, 1), 3), ((3, 0), (2, 0), 1)])
+        )
 
     def test_isFinished(self):
         r = DotsGame()
@@ -76,6 +83,16 @@ class TestDotsGame(unittest.TestCase):
         self.assertTrue(r.isFinished(), "Game has no moves left")
         r.field = [[2, 1, 0], [2, 0, 0], [0, 0, 0], [0, 0, 0]]
         self.assertFalse(r.isFinished(), "Game is has moves left")
+
+    def test_get_attribute(self):
+        r = DotsGame()
+        testField = [[2, 2, 2], [1, 0, 1], [1, 1, 1], [1, 2, 1]]
+        r.field = testField
+        for y in range(4):
+            for x in range(3):
+                self.assertEqual(
+                    r[(y, x)], testField[y][x], f"({y},{x}) is missmatching"
+                )
 
 
 if __name__ == "__main__":

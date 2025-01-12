@@ -9,6 +9,7 @@ from guacamole.constants import (
     SCREEN_BASE_WIDTH,
     SCREEN_BASE_HEIGHT,
     KEY_MOUSE_POS,
+    KEY_CLICKED_AT,
 )
 from guacamole.shaders import (
     TriangulateShader,
@@ -39,19 +40,29 @@ class BaseApp(ABC):
         glfw.make_context_current(self.window1)
         glfw.set_window_size_callback(self.window1, self.onWindowResize)
         glfw.set_key_callback(self.window1, self.onKeyboardInput)
+        glfw.set_mouse_button_callback(self.window1, self.onMouseButton)
         self.basegame = self.initGame()
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GLU.gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
         self.pixel_shader = LightHouseShader(self.screen_size)
         self.fpsCounter = Timer()
+        self._messagQueue = list()
 
     def initGame(self) -> BaseGame:
         return BaseGame(self.game_size[0], self.game_size[0])
 
     def draw(self) -> None:
         # GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.pixel_shader.frameBuffer)
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        # GL.glTranslatef(0.0, 0.0, -5)
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glLoadIdentity()
+        GL.glViewport(0, 0, self.screen_size[0], self.screen_size[1])
+        # GL.glLoadIdentity()
+        GLU.gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
+        # GL.glLoadIdentity()
+        GL.glMatrixMode(GL.GL_MODELVIEW)
         self.basegame.draw()
         # GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
         # self.pixel_shader.draw()
@@ -62,16 +73,32 @@ class BaseApp(ABC):
             deltaT = self.fpsCounter.tick()
             mouse_pos = glm.vec2(glfw.get_cursor_pos(self.window1))
             mouse_pos /= self.screen_size
-            self.basegame.update(**{KEY_DELTA_T: deltaT, KEY_MOUSE_POS: mouse_pos})
+            args = dict()
+            args[KEY_DELTA_T] = deltaT
+            args[KEY_MOUSE_POS] = mouse_pos
+            while len(self._messagQueue) > 0:
+                key, val = self._messagQueue.pop(0)
+                args[key] = val
+
+            self.basegame.update(**args)
             self.draw()
             # self.pixel_shader.draw()
             glfw.poll_events()
 
     def onWindowResize(self, window, width, height) -> None:
+        self.screen_size = (width, height)
         GL.glViewport(0, 0, width, height)
 
     def onKeyboardInput(self, window, key: int, scancode: int, action: int, mods: int):
         print(key, scancode, action, mods)
+
+    def onMouseButton(self, window, key: int, action: int, mods: int):
+        if key == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
+            mousePos = glm.vec2(glfw.get_cursor_pos(window))
+            mousePos /= self.screen_size
+            # invert item
+            mousePos.y = 1 - mousePos.y
+            self._messagQueue.append((KEY_CLICKED_AT, mousePos))
 
     def close(self) -> None:
         sys.exit()

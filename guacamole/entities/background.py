@@ -1,8 +1,14 @@
 from OpenGL import GL
-from guacamole.constants import SCREEN_BASE_HEIGHT, SCREEN_BASE_WIDTH, KEY_MOUSE_POS
+from guacamole.constants import (
+    SCREEN_BASE_HEIGHT,
+    SCREEN_BASE_WIDTH,
+    KEY_MOUSE_POS,
+    KEY_DELTA_T,
+)
 from .sprite import Sprite
 from guacamole.shaders.util import create_shader_program
 import glm
+import math
 
 VERTEX_BUFFER = 0
 COLOR_BUFFER = 1
@@ -34,12 +40,13 @@ in vec3 pos;
 
 uniform vec2 mousePosition;
 uniform vec2 resolution;
+uniform vec2 timeOffset;
 
 void main()
 {{
     vec2 uv = TexCoords;
-    float red = pos.x+mousePosition.x;
-    float green = pos.y+mousePosition.y;
+    float red = pos.x+mousePosition.x+timeOffset.x;
+    float green = pos.y+mousePosition.y+timeOffset.y;
     if(mod(red,2)>=1){{
         red=1-fract(red);
     }}else{{
@@ -51,7 +58,7 @@ void main()
         green=fract(green);
     }}
     float blue = 1.0-max(red,green);
-    FragColor = vec4(red,green, blue, 1.0);
+    FragColor = vec4(red,green, blue,0.25);
 }} 
 """
 
@@ -68,11 +75,17 @@ class GradientBackground(Sprite):
         self._shaderParamMousePosition = GL.glGetUniformLocation(
             self._shader, "mousePosition"
         )
+        self._shaderParamTimeOffset = GL.glGetUniformLocation(
+            self._shader, "timeOffset"
+        )
+        self._animTime = 0
 
     def update(self, *args, **kwargs) -> None:
         super().update(*args, **kwargs)
         if KEY_MOUSE_POS in kwargs:
             self.mousePosition = kwargs[KEY_MOUSE_POS]
+        if KEY_DELTA_T in kwargs:
+            self._animTime += kwargs[KEY_DELTA_T]
 
     @property
     def mousePosition(self) -> glm.vec2:
@@ -86,6 +99,8 @@ class GradientBackground(Sprite):
             self._mousePosition.xy = pos
 
     def draw(self):
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
         GL.glUseProgram(self._shader)
         GL.glUniform2f(
             self._shaderParamMousePosition,
@@ -93,7 +108,11 @@ class GradientBackground(Sprite):
             self._mousePosition[1],
         )
         GL.glUniform2f(self._shaderParamResolution, self._size[0], self._size[1])
-
+        GL.glUniform2f(
+            self._shaderParamTimeOffset,
+            math.sin(self._animTime / 2),
+            math.cos(math.sqrt(self._animTime)) * 3,
+        )
         GL.glBegin(GL.GL_QUADS)
         # GL.glColor3f(1.0, 0.0, 0.0)  # Red
         GL.glVertex2f(-1, -1)
@@ -105,3 +124,4 @@ class GradientBackground(Sprite):
         GL.glVertex2f(-1, 1)
         GL.glEnd()
         GL.glUseProgram(0)
+        GL.glDisable(GL.GL_BLEND)

@@ -2,6 +2,9 @@ from guacamole.entities import Player, GradientBackground
 from guacamole.constants import PIXEL_SIZE_HORIZONTAL, PIXEL_SIZE_VERTICAL
 from guacamole.util import Rect
 from guacamole.entities.group import Group
+from guacamole.entities.box import Box, Entity
+from guacamole.entities.water import Water
+from guacamole.entities.dots import DotsGameEntity
 import glfw
 
 
@@ -15,8 +18,8 @@ class BaseGame(Group):
         )
         self.background = GradientBackground()
         self.add(self.background)
-        self.add(self.player)
-        self.player.velocity = (8000, 450)
+        self.item = DotsGameEntity()
+        self.add(self.item)
 
     def update(self, *args, **kwargs) -> None:
         super().update(*args, **kwargs)

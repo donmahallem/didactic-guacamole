@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import glm
 
 
 class DotsGame:
@@ -8,6 +9,7 @@ class DotsGame:
         self._size = size
         self.colors = colors
         self.reset()
+        self._groupMinSize = 2
 
     @property
     def size(self) -> tuple[int, int]:
@@ -20,7 +22,7 @@ class DotsGame:
     @field.setter
     def field(self, f) -> None:
         self._field = np.array(f, dtype=np.uint8)
-        self._size = self._field.shape
+        self._size = (self._field.shape[1], self._field.shape[0])
 
     @property
     def seed(self):
@@ -44,7 +46,9 @@ class DotsGame:
         # abs as seed must be non-negative
         self._seed = abs(hash(seed))
         rnd = np.random.default_rng(self._seed)
-        self._field = rnd.integers(1, self._colors + 1, self._size, dtype=np.uint8)
+        self._field = rnd.integers(
+            1, self._colors + 1, (self._size[1], self._size[0]), dtype=np.uint8
+        )
         self._score = 0
 
     def selectConnected(self, y, x):
@@ -67,8 +71,8 @@ class DotsGame:
                 if (
                     nextPos[0] < 0
                     or nextPos[1] < 0
-                    or nextPos[0] >= self._size[0]
-                    or nextPos[1] >= self._size[1]
+                    or nextPos[0] >= self._size[1]
+                    or nextPos[1] >= self._size[0]
                 ):
                     continue
                 if (
@@ -80,9 +84,20 @@ class DotsGame:
         self._score += len(selected) * (len(selected) - 1)
         return selected
 
+    def dropDotsAt(self, pos: glm.vec2 | tuple[int, int]):
+        if isinstance(pos, glm.vec2):
+            x = int(pos.x)
+            y = int(pos.y)
+        else:
+            x = int(pos[1])
+            y = int(pos[0])
+        return self.selectDots((y, x))
+
     def selectDots(self, dots):
-        selected = dots if isinstance(dots, list) else self.selectConnected(dots)
-        if selected is None:
+        selected = (
+            dots if isinstance(dots, list) else self.selectConnected(dots[0], dots[1])
+        )
+        if selected is None or len(selected) < self._groupMinSize:
             return
         minX = self._size[1] + 1
         maxX = -1
@@ -94,19 +109,23 @@ class DotsGame:
 
     def applyGravity(self, l=None, r=None):
         left = l if l else 0
-        right = r if r else self._size[1] - 1
+        right = r if r else self._size[0] - 1
         moved = set()
+        offsetX = 0
         for x in range(left, right + 1):
-            lastEmptyY = -1
-            for y in range(self._size[0]):
-                if self._field[y, x] == 0 and lastEmptyY < 0:
-                    lastEmptyY = y
+            offsetY = 0
+            for y in range(self._size[1]):
+                if self._field[y, x] == 0:
+                    offsetY -= 1
                     continue
-                elif self._field[y, x] != 0 and lastEmptyY >= 0:
-                    moved.add(((y, x), (lastEmptyY, x), int(self._field[y, x])))
-                    self._field[lastEmptyY, x] = self._field[y, x]
+                elif offsetX != 0 or offsetY != 0:
+                    moved.add(
+                        ((y, x), (y + offsetY, x + offsetX), int(self._field[y, x]))
+                    )
+                    self._field[y + offsetY, x + offsetX] = self._field[y, x]
                     self._field[y, x] = 0
-                    lastEmptyY += 1
+            if self._field[0, x + offsetX] == 0:
+                offsetX -= 1
         return moved if len(moved) else None
 
     def isFinished(self):
@@ -127,6 +146,11 @@ class DotsGame:
             and self._size == value.size
             and np.all(self._field == value.field)
         )
+
+    def __getitem__(self, name):
+        if not isinstance(name, tuple) or len(name) != 2:
+            raise ValueError("Key must be a tuple of size two")
+        return self._field[name[0], name[1]]
 
     def __repr__(self):
         return f"DotsGame(colors={self._colors},size={self._size})"
