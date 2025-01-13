@@ -59,7 +59,7 @@ class BaseApp(ABC):
 
     def draw(self) -> None:
         GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glDepthFunc(GL.GL_ALWAYS)
+        GL.glDepthFunc(GL.GL_LEQUAL)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()

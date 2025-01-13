@@ -12,11 +12,11 @@ class BaseGame(Group):
     def __init__(self, width, height, *sprites):
         super().__init__(*sprites)
         self.background = GradientBackground()
-        self.background.position.z = -1
+        self.background.position.z = 1
+        self.add(self.background)
         self.item = DotsGameEntity()
         self.item.position = (0, 0, 0)
         self.add(self.item)
-        self.add(self.background)
 
     def update(self, *args, **kwargs) -> None:
         super().update(*args, **kwargs)
