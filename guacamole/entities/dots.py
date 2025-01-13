@@ -68,11 +68,9 @@ class CursorEntity(Sprite):
         self.position.xy = self._gamePosition * (PIXEL_VEC + SPACING_VEC)
         self._animationOffset.xy = offset
         self._animator.reset()
-        print(self._gamePosition, self.position)
 
     def animateFrom(self, pos: glm.vec2 | tuple[float, float]) -> None:
         self._animationOffset = pos - self.position.xy
-        print(pos, self.position, self._animationOffset)
         self._animator.reset()
 
     def draw(self):
@@ -90,12 +88,12 @@ class CursorEntity(Sprite):
                 + ((1 - self._animator.progress) * self._animationOffset.y),
                 self.position.z,
             )
-        GL.glScalef(self._size.x, self._size.y, 0)
+        GL.glScalef(self._size.x, self._size.y, 1)
         GL.glBegin(GL.GL_QUADS)
-        GL.glVertex2f(0, 0)
-        GL.glVertex2f(1, 0)
-        GL.glVertex2f(1, 1)
-        GL.glVertex2f(0, 1)
+        GL.glVertex3f(0, 0, 0)
+        GL.glVertex3f(1, 0, 0)
+        GL.glVertex3f(1, 1, 0)
+        GL.glVertex3f(0, 1, 0)
         GL.glEnd()
         GL.glPopMatrix()
         GL.glDisable(GL.GL_BLEND)
@@ -142,7 +140,6 @@ class DotsEntity(Sprite):
 
     def animateFrom(self, pos: glm.vec2 | tuple[float, float]) -> None:
         self._animationOffset = pos - self.position.xy
-        print(pos, self.position, self._animationOffset)
         self._animator.reset()
 
     def draw(self):
@@ -169,12 +166,12 @@ class DotsEntity(Sprite):
                 + ((1 - self._animator.progress) * self._animationOffset.y),
                 self.position.z,
             )
-        GL.glScalef(self._size.x, self._size.y, 0)
+        GL.glScalef(self._size.x, self._size.y, 1)
         GL.glBegin(GL.GL_QUADS)
-        GL.glVertex2f(0, 0)
-        GL.glVertex2f(1, 0)
-        GL.glVertex2f(1, 1)
-        GL.glVertex2f(0, 1)
+        GL.glVertex3f(0, 0, 0)
+        GL.glVertex3f(1, 0, 0)
+        GL.glVertex3f(1, 1, 0)
+        GL.glVertex3f(0, 1, 0)
         GL.glEnd()
         GL.glPopMatrix()
 
@@ -200,6 +197,8 @@ class DotsGameEntity(Group):
         self.updateMatrix()
         self._cursor = CursorEntity()
         self.add(self._cursor)
+        self._cursor.position.z = 0
+        self.z = 0.4
         self._cursor.gamePosition = (2, 2)
         self._cursor.size = PIXEL_VEC
 
@@ -246,10 +245,11 @@ class DotsGameEntity(Group):
             # only update on change
             self.updateMatrix()
             for moveFrom, moveTo, _ in res[1]:
-                print(moveFrom, moveTo)
                 self._map[moveTo].animateFrom(
                     (SPACING_VEC + PIXEL_VEC) * (moveFrom[1], moveFrom[0])
                 )
+            if self._game.isFinished():
+                print(f"Game finished with score: {self._game.score}")
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)

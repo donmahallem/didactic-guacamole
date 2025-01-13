@@ -17,8 +17,10 @@ class BaseGame(Group):
             (50, 75), (player_size, player_size), Rect(0, 0, width, height)
         )
         self.background = GradientBackground()
+        self.background.position.z = 1
         self.add(self.background)
         self.item = DotsGameEntity()
+        self.item.position = (0, 0, 0)
         self.add(self.item)
 
     def update(self, *args, **kwargs) -> None:

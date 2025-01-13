@@ -34,13 +34,25 @@ class Sprite:
     def x(self):
         return self._position.x
 
+    @x.setter
+    def x(self, val):
+        self._position.x = val
+
     @property
     def y(self):
         return self._position.y
 
+    @y.setter
+    def y(self, val):
+        self._position.y = val
+
     @property
     def z(self):
         return self._position.z
+
+    @z.setter
+    def z(self, val):
+        self._position.z = val
 
     def draw(self):
         """Draw function"""

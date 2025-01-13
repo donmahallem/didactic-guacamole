@@ -126,8 +126,8 @@ class DotsGame:
         return moved
 
     def isFinished(self):
-        for x in range(self._size[1] - 1):
-            for y in range(self._size[0] - 1):
+        for x in range(self._size[0] - 1):
+            for y in range(self._size[1] - 1):
                 if self._field[y, x] == 0:
                     continue
                 if (

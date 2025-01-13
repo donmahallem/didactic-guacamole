@@ -41,8 +41,8 @@ class BaseApp(ABC):
         if not self.window1:
             glfw.terminate()
             raise Exception("GLFW window can't be created")
-        glfw.set_window_aspect_ratio(self.window1, self.game_size[0], self.game_size[1])
         glfw.make_context_current(self.window1)
+        glfw.set_window_aspect_ratio(self.window1, self.game_size[0], self.game_size[1])
         glfw.set_window_size_callback(self.window1, self.onWindowResize)
         glfw.set_key_callback(self.window1, self.onKeyboardInput)
         glfw.set_mouse_button_callback(self.window1, self.onMouseButton)
@@ -58,19 +58,15 @@ class BaseApp(ABC):
         return BaseGame(self.game_size[0], self.game_size[0])
 
     def draw(self) -> None:
-        # GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, self.pixel_shader.frameBuffer)
+        GL.glDepthFunc(GL.GL_LEQUAL)
+        GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-        # GL.glTranslatef(0.0, 0.0, -5)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         GL.glViewport(0, 0, self.screen_size[0], self.screen_size[1])
-        # GL.glLoadIdentity()
         GLU.gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
-        # GL.glLoadIdentity()
         GL.glMatrixMode(GL.GL_MODELVIEW)
         self.basegame.draw()
-        # GL.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0)
-        # self.pixel_shader.draw()
         glfw.swap_buffers(self.window1)
 
     def run(self) -> None:

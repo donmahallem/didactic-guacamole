@@ -65,8 +65,8 @@ void main()
 
 class GradientBackground(Sprite):
     def __init__(self, size=(SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT)):
+        super().__init__()
         self._size = size
-        print(size)
         self._mousePosition = glm.vec2(0, 0)
         self._shader = create_shader_program(vertex_shader, fragment_shader)
         self._shaderParamResolution = GL.glGetUniformLocation(

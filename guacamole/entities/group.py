@@ -1,5 +1,6 @@
 from guacamole.entities.sprite import Sprite
 import typing
+from OpenGL import GL
 
 
 class Group(Sprite):
@@ -9,8 +10,11 @@ class Group(Sprite):
         self._items: Sprite | typing.Self = []
 
     def draw(self):
+        GL.glPushMatrix()
+        GL.glTranslatef(self.position.x, self.position.y, self.position.z)
         for item in self._items:
             item.draw()
+        GL.glPopMatrix()
 
     def update(self, *args, **kwargs):
         for item in self._items:
