@@ -58,7 +58,7 @@ void main()
         green=fract(green);
     }}
     float blue = 1.0-max(red,green);
-    FragColor = vec4(red,green, blue,0.8);
+    FragColor = vec4(red,green, blue,0.5);
 }} 
 """
 

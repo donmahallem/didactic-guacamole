@@ -15,6 +15,7 @@ from guacamole.constants import (
     KEY_MOVE_LEFT,
     KEY_MOVE_RIGHT,
     KEY_SELECT,
+    KEY_RESET_GAME,
 )
 from guacamole.shaders import (
     TriangulateShader,
@@ -30,7 +31,12 @@ class BaseApp(ABC):
         self,
         screen_size=(600, 600 * SCREEN_BASE_HEIGHT / SCREEN_BASE_WIDTH),
         game_size=(SCREEN_BASE_WIDTH, SCREEN_BASE_HEIGHT),
+        colors=4,
+        seed=None,
     ):
+        print(f"Game started with {colors} and seed {seed}")
+        self._colors = colors
+        self._seed = seed
         if not glfw.init():
             raise Exception("GLFW can't be initialized")
         self.game_size = (int(game_size[0]), int(game_size[1]))
@@ -55,7 +61,9 @@ class BaseApp(ABC):
         self._messagQueue = list()
 
     def initGame(self) -> BaseGame:
-        return BaseGame(self.game_size[0], self.game_size[0])
+        return BaseGame(
+            self.game_size[0], self.game_size[0], colors=self._colors, seed=self._seed
+        )
 
     def draw(self) -> None:
         GL.glEnable(GL.GL_DEPTH_TEST)
@@ -91,7 +99,6 @@ class BaseApp(ABC):
         GL.glViewport(0, 0, width, height)
 
     def onKeyboardInput(self, window, key: int, scancode: int, action: int, mods: int):
-        print(key)
         if key == glfw.KEY_A and action == glfw.PRESS:
             self._messagQueue.append((KEY_MOVE_LEFT, True))
         elif key == glfw.KEY_S and action == glfw.PRESS:
@@ -102,6 +109,8 @@ class BaseApp(ABC):
             self._messagQueue.append((KEY_MOVE_TOP, True))
         elif key == glfw.KEY_SPACE and action == glfw.PRESS:
             self._messagQueue.append((KEY_SELECT, True))
+        elif key == glfw.KEY_R and action == glfw.PRESS:
+            self._messagQueue.append((KEY_RESET_GAME, True))
 
     def onMouseButton(self, window, key: int, action: int, mods: int):
         if key == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:

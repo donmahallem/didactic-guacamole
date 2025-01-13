@@ -2,6 +2,7 @@ from guacamole.dots.dots_game import DotsGame
 from .group import Group
 from .sprite import Sprite
 from .pool import Pool
+from .number import Number
 from OpenGL import GL
 from guacamole.constants import (
     KEY_RESET_GAME,
@@ -76,7 +77,7 @@ class CursorEntity(Sprite):
     def draw(self):
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
-        GL.glColor4f(1.0, 1.0, 1.0, (1 + math.sin(self._animationTimer)) * 0.5 + 0.1)
+        GL.glColor4f(1.0, 1.0, 1.0, (1 + math.sin(self._animationTimer)) * 0.4 + 0.1)
         GL.glPushMatrix()
         if self._animator.done:
             GL.glTranslatef(self.position.x, self.position.y, self.position.z)
@@ -118,17 +119,9 @@ class DotsEntity(Sprite):
     def __init__(self, color=1, parent=None):
         super().__init__(parent)
         self._color = color
-        self._size = glm.vec2(1)
+        # self._size = glm.vec2(1)
         self._animator: Animation = EaseInQuadAnimation(0.3)
         self._animationOffset: glm.vec2 = glm.vec2(0)
-
-    @property
-    def size(self):
-        return self._size
-
-    @size.setter
-    def size(self, s):
-        self._size.xy = s
 
     @property
     def color(self):
@@ -166,7 +159,7 @@ class DotsEntity(Sprite):
                 + ((1 - self._animator.progress) * self._animationOffset.y),
                 self.position.z,
             )
-        GL.glScalef(self._size.x, self._size.y, 1)
+        GL.glScalef(self.scale.x, self.scale.y, self.scale.z)
         GL.glBegin(GL.GL_QUADS)
         GL.glVertex3f(0, 0, 0)
         GL.glVertex3f(1, 0, 0)
@@ -188,12 +181,12 @@ class DotsPool(Pool[DotsEntity]):
 
 
 class DotsGameEntity(Group):
-    def __init__(self, colors=3, size=(28, 14), parent: Group = None):
+    def __init__(self, colors=3, size=(28, 14), seed=None, parent: Group = None):
         super().__init__(parent)
         self._game: DotsGame = DotsGame(colors, size)
         self._dotsPool: DotsPool = DotsPool()
         self._map: dict[(int, int), DotsEntity] = dict()
-        self._game.reset(292)
+        self._game.reset(seed)
         self.updateMatrix()
         self._cursor = CursorEntity()
         self.add(self._cursor)
@@ -201,6 +194,10 @@ class DotsGameEntity(Group):
         self.z = 0
         self._cursor.gamePosition = (2, 2)
         self._cursor.size = PIXEL_VEC
+        self._number = Number()
+        self._number.scale = (300, 600, 1)
+        self._number.position.xyz = (400, 400, 0.2)
+        self.add(self._number)
 
     def updateMatrix(self):
         for y in range(self._game.size[1]):
@@ -218,7 +215,7 @@ class DotsGameEntity(Group):
                 elif expectedColor > 0:
                     item = self._dotsPool.getItem()
                     item.color = expectedColor
-                    item.size = PIXEL_VEC
+                    item.scale.xy = PIXEL_VEC
                     item.position = (SPACING_VEC + PIXEL_VEC) * (x, y)
                     self._map[pos] = item
                     self.add(item)

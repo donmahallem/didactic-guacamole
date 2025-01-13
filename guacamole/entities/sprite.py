@@ -9,9 +9,10 @@ class Sprite:
     Simple sprite class
     """
 
-    def __init__(self, parent: typing.Self = None):
+    def __init__(self, parent: typing.Self = None, scale=(1, 1, 1)):
         self._parent = parent
         self._position = glm.vec3(0)
+        self._scale = glm.vec3(scale)
 
     @property
     def position(self):
@@ -53,6 +54,14 @@ class Sprite:
     @z.setter
     def z(self, val):
         self._position.z = val
+
+    @property
+    def scale(self):
+        return self._scale
+
+    @scale.setter
+    def scale(self, val):
+        self._scale = glm.vec3(val)
 
     def draw(self):
         """Draw function"""

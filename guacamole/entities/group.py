@@ -12,6 +12,7 @@ class Group(Sprite):
     def draw(self):
         GL.glPushMatrix()
         GL.glTranslatef(self.position.x, self.position.y, self.position.z)
+        GL.glScalef(self.scale.x, self.scale.y, self.scale.z)
         for item in self._items:
             item.draw()
         GL.glPopMatrix()
