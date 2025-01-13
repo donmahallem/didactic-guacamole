@@ -197,8 +197,8 @@ class DotsGameEntity(Group):
         self.updateMatrix()
         self._cursor = CursorEntity()
         self.add(self._cursor)
-        self._cursor.position.z = 0
-        self.z = 0.4
+        self._cursor.position.z = -0.1
+        self.z = 0
         self._cursor.gamePosition = (2, 2)
         self._cursor.size = PIXEL_VEC
 

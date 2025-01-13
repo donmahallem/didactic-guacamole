@@ -58,7 +58,7 @@ void main()
         green=fract(green);
     }}
     float blue = 1.0-max(red,green);
-    FragColor = vec4(red,green, blue,0.25);
+    FragColor = vec4(red,green, blue,0.8);
 }} 
 """
 
@@ -113,15 +113,18 @@ class GradientBackground(Sprite):
             math.sin(self._animTime / 2),
             math.cos(math.sqrt(self._animTime)) * 3,
         )
+        GL.glPushMatrix()
+        GL.glTranslatef(self.position.x, self.position.y, self.position.z)
         GL.glBegin(GL.GL_QUADS)
         # GL.glColor3f(1.0, 0.0, 0.0)  # Red
-        GL.glVertex2f(-1, -1)
+        GL.glVertex3f(-1, -1, 0)
         # GL.glColor3f(0.0, 1.0, 0.0)  # Green
-        GL.glVertex2f(1, -1)
+        GL.glVertex3f(1, -1, 0)
         # GL.glColor3f(0.0, 0.0, 1.0)  # Blue
-        GL.glVertex2f(1, 1)
+        GL.glVertex3f(1, 1, 0)
         # GL.glColor3f(1.0, 1.0, 0.0)  # Yellow
-        GL.glVertex2f(-1, 1)
+        GL.glVertex3f(-1, 1, 0)
         GL.glEnd()
+        GL.glPopMatrix()
         GL.glUseProgram(0)
         GL.glDisable(GL.GL_BLEND)

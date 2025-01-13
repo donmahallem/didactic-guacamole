@@ -58,8 +58,8 @@ class BaseApp(ABC):
         return BaseGame(self.game_size[0], self.game_size[0])
 
     def draw(self) -> None:
-        GL.glDepthFunc(GL.GL_LEQUAL)
         GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glDepthFunc(GL.GL_ALWAYS)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()

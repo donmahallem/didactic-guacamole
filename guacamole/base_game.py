@@ -11,17 +11,12 @@ import glfw
 class BaseGame(Group):
     def __init__(self, width, height, *sprites):
         super().__init__(*sprites)
-        self.rect = Rect(0, 0, width, height)
-        player_size = min(PIXEL_SIZE_HORIZONTAL * 2, PIXEL_SIZE_VERTICAL * 2)
-        self.player = Player(
-            (50, 75), (player_size, player_size), Rect(0, 0, width, height)
-        )
         self.background = GradientBackground()
-        self.background.position.z = 1
-        self.add(self.background)
+        self.background.position.z = -1
         self.item = DotsGameEntity()
         self.item.position = (0, 0, 0)
         self.add(self.item)
+        self.add(self.background)
 
     def update(self, *args, **kwargs) -> None:
         super().update(*args, **kwargs)
