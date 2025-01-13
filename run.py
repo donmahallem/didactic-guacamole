@@ -4,7 +4,12 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Didactic Guacamole")
     parser.add_argument(
-        "--colors", "-c", help="How many colors", type=int, choices=[4, 5, 6], default=4
+        "--colors",
+        "-c",
+        help="How many colors",
+        type=int,
+        choices=[3, 4, 5, 6],
+        default=3,
     )
     parser.add_argument(
         "--seed", "-s", help="What seed to use", type=str, default=None, required=False

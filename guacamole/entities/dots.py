@@ -77,7 +77,13 @@ class CursorEntity(Sprite):
     def draw(self):
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
-        GL.glColor4f(1.0, 1.0, 1.0, (1 + math.sin(self._animationTimer)) * 0.4 + 0.1)
+        colorBaseValue = math.sin(self._animationTimer * 2) / 2 * 0.5
+        GL.glColor4f(
+            colorBaseValue,
+            colorBaseValue,
+            colorBaseValue,
+            (1 + math.sin(self._animationTimer)) * 0.4 + 0.1,
+        )
         GL.glPushMatrix()
         if self._animator.done:
             GL.glTranslatef(self.position.x, self.position.y, self.position.z)
@@ -250,11 +256,13 @@ class DotsGameEntity(Group):
             if self._game.isFinished():
                 print(f"Game finished with score: {self._game.score}")
                 self._score.renderable = True
+                self._cursor.renderable = False
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         if KEY_RESET_GAME in kwargs:
             self._score.renderable = False
+            self._cursor.renderable = True
             self._game.reset(random.random())
             self.updateMatrix()
             return

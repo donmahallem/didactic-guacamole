@@ -24,6 +24,29 @@ from guacamole.shaders import (
     LightHouseShader,
 )
 from guacamole.fps_counter import Timer
+from guacamole.shaders.util import create_shader_program
+
+vertex_shader_identy = """
+#version 330
+in vec2 position;
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+}
+"""
+
+fragment_shader_squares = """
+#version 330
+uniform sampler2D screenTexture;
+uniform float pixelSize;
+uniform float screenHeight;
+uniform float screenWidth;
+out vec4 FragColor;
+void main() {
+    vec2 uv = gl_FragCoord.xy / vec2(screenWidth, screenHeight);
+    vec2 pixelatedUV = floor(uv / pixelSize) * pixelSize;
+    FragColor = texture(screenTexture, pixelatedUV);
+}
+"""
 
 
 class BaseApp(ABC):
@@ -56,8 +79,10 @@ class BaseApp(ABC):
         GL.glClearColor(0.0, 0.0, 0.0, 1.0)
         GL.glMatrixMode(GL.GL_PROJECTION)
         GLU.gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
-        self.pixel_shader = LightHouseShader(self.screen_size)
-        self.fpsCounter = Timer()
+        self._pixelShader = create_shader_program(
+            vertex_shader_identy, fragment_shader_squares
+        )
+        self._fpsCounter = Timer()
         self._messagQueue = list()
 
     def initGame(self) -> BaseGame:
@@ -74,12 +99,14 @@ class BaseApp(ABC):
         GL.glViewport(0, 0, self.screen_size[0], self.screen_size[1])
         GLU.gluOrtho2D(0, SCREEN_BASE_WIDTH, 0, SCREEN_BASE_HEIGHT)
         GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glUseProgram(self._pixelShader)
         self.basegame.draw()
+        GL.glUseProgram(0)
         glfw.swap_buffers(self.window1)
 
     def run(self) -> None:
         while not glfw.window_should_close(self.window1):
-            deltaT = self.fpsCounter.tick()
+            deltaT = self._fpsCounter.tick()
             mouse_pos = glm.vec2(glfw.get_cursor_pos(self.window1))
             mouse_pos /= self.screen_size
             args = dict()
