@@ -45,6 +45,6 @@ class Timer:
             raise ValueError("Percentile must be an integer")
         elif percentile < 0 or percentile > 98:
             raise ValueError("Percentile must be [0-98]")
-        if len(self._fpsBuffer) >= 2:
+        if len(self._fpsBuffer) < 2:
             return -1
         return statistics.quantiles(self._fpsBuffer, n=100)[percentile]

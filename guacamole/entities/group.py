@@ -14,6 +14,8 @@ class Group(Sprite):
         GL.glTranslatef(self.position.x, self.position.y, self.position.z)
         GL.glScalef(self.scale.x, self.scale.y, self.scale.z)
         for item in self._items:
+            if not item.renderable:
+                continue
             item.draw()
         GL.glPopMatrix()
 
@@ -31,6 +33,9 @@ class Group(Sprite):
     def __iadd__(self, other):
         self.add(other)
         return self
+
+    def getChildAt(self, idx):
+        return self._items[idx]
 
     def __isub__(self, other):
         self.remove(other)

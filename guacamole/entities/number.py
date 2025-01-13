@@ -13,47 +13,22 @@ import codecs
 with codecs.open("./guacamole/entities/texture_num.json", mode="r") as f:
     LETTER_COORDS = json.load(f)
 
-VERTEX_BUFFER = 0
-COLOR_BUFFER = 1
-
-
-vertex_shader = f"""
-#version 330 core
-layout(location = 0) in vec3 vertexPos;
-layout(location = 1) in vec3 texColor;
-layout(location = 2) in vec2 texCoord;
-out vec2 TexCoords;
-out vec3 fragColor;
-void main() {{ 
-    gl_Position = vec4(vertexPos, 1.0);
-    fragColor = texColor;
-    TexCoords = texCoord;
-}}
-"""
-fragment_shader = """
-#version 330 core
-in vec2 TexCoords;
-out vec4 color;
-uniform sampler2D texture1;
-void main()
-{
-    vec2 uv = TexCoords.xy * textureSize(texture1, 1);
-    color = texture(texture1, TexCoords.xy);
-}
-"""
-
 
 class Number(Sprite):
-    def __init__(self, size=(0.5, 1)):
+    def __init__(self, size=(1, 1)):
         super().__init__()
         self.scale.xy = size
         self._letterCoordStart = glm.vec2(0)
         self._letterCoordEnd = glm.vec2(1)
+        self._displaySize = glm.vec2(1)
         self.displayNumber = 0
 
         self._texture = loadTextureGrey("./guacamole/entities/texture_num.png")
-        self._shader = create_shader_program(vertex_shader, fragment_shader)
         self._animTime = 0
+
+    @property
+    def displaySize(self) -> glm.vec2:
+        return self._displaySize
 
     @property
     def displayNumber(self):
@@ -65,7 +40,6 @@ class Number(Sprite):
         WIDTH = 5 * 128
         HEIGHT = 2 * 128
         keyVal = str(val)
-        print(LETTER_COORDS[keyVal])
         self._letterCoordStart.xy = (
             LETTER_COORDS[keyVal][0] / WIDTH,
             1 - (LETTER_COORDS[keyVal][1] / HEIGHT),
@@ -74,6 +48,12 @@ class Number(Sprite):
             LETTER_COORDS[keyVal][2] / WIDTH,
             1 - (LETTER_COORDS[keyVal][3] / HEIGHT),
         )
+        self._displaySize.x = (LETTER_COORDS[keyVal][2] - LETTER_COORDS[keyVal][0]) / (
+            LETTER_COORDS[keyVal][3] - LETTER_COORDS[keyVal][1]
+        )
+
+    def __repr__(self):
+        return f"NumberSprite({self.displayNumber})"
 
     def draw(self):
         GL.glEnable(GL.GL_TEXTURE_2D)

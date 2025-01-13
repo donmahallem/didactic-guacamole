@@ -13,6 +13,15 @@ class Sprite:
         self._parent = parent
         self._position = glm.vec3(0)
         self._scale = glm.vec3(scale)
+        self._renderable = True
+
+    @property
+    def renderable(self) -> bool:
+        return self._renderable
+
+    @renderable.setter
+    def renderable(self, state) -> None:
+        self._renderable = state
 
     @property
     def position(self):

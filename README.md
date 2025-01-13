@@ -18,3 +18,7 @@ The more fields you solve within a single action the more points you get
 You can either navigate the cursor with W,A,S,D and SPACE or via the Moise Pointer
 
 You can reset the game with the R-Key
+
+TODO:
+
+Handle entity/texture desctruction

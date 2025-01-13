@@ -2,7 +2,7 @@ from guacamole.dots.dots_game import DotsGame
 from .group import Group
 from .sprite import Sprite
 from .pool import Pool
-from .number import Number
+from .score import ScoreDisplay
 from OpenGL import GL
 from guacamole.constants import (
     KEY_RESET_GAME,
@@ -194,10 +194,11 @@ class DotsGameEntity(Group):
         self.z = 0
         self._cursor.gamePosition = (2, 2)
         self._cursor.size = PIXEL_VEC
-        self._number = Number()
-        self._number.scale = (300, 600, 1)
-        self._number.position.xyz = (400, 400, 0.2)
-        self.add(self._number)
+        self._score = ScoreDisplay()
+        self._score.scale = (SCREEN_BASE_HEIGHT / 4, SCREEN_BASE_HEIGHT / 4, 1)
+        self._score.position.xyz = (200, 400, 0.8)
+        self.add(self._score)
+        self._score.renderable = False
 
     def updateMatrix(self):
         for y in range(self._game.size[1]):
@@ -245,12 +246,15 @@ class DotsGameEntity(Group):
                 self._map[moveTo].animateFrom(
                     (SPACING_VEC + PIXEL_VEC) * (moveFrom[1], moveFrom[0])
                 )
+            self._score.displayNumber = self._game.score
             if self._game.isFinished():
                 print(f"Game finished with score: {self._game.score}")
+                self._score.renderable = True
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
         if KEY_RESET_GAME in kwargs:
+            self._score.renderable = False
             self._game.reset(random.random())
             self.updateMatrix()
             return
