@@ -19,12 +19,15 @@ COLOR_BUFFER = 1
 
 vertex_shader = f"""
 #version 330 core
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec2 texCoords;
+layout(location = 0) in vec3 vertexPos;
+layout(location = 1) in vec3 texColor;
+layout(location = 2) in vec2 texCoord;
 out vec2 TexCoords;
+out vec3 fragColor;
 void main() {{ 
-    gl_Position = vec4(position, 1.0);
-    TexCoords = texCoords;
+    gl_Position = vec4(vertexPos, 1.0);
+    fragColor = texColor;
+    TexCoords = texCoord;
 }}
 """
 fragment_shader = """
@@ -34,7 +37,8 @@ out vec4 color;
 uniform sampler2D texture1;
 void main()
 {
-    color = texture(texture1, TexCoords/256);
+    vec2 uv = TexCoords.xy * textureSize(texture1, 1);
+    color = texture(texture1, TexCoords.xy);
 }
 """
 
@@ -73,26 +77,30 @@ class Number(Sprite):
 
     def draw(self):
         GL.glEnable(GL.GL_TEXTURE_2D)
-        # GL.glEnable(GL.GL_BLEND)
-        # GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
-        # GL.glUseProgram(self._shader)
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
         GL.glBindTexture(GL.GL_TEXTURE_2D, self._texture)
         GL.glPushMatrix()
         GL.glTranslatef(self.position.x, self.position.y, self.position.z)
         GL.glScalef(self.scale.x, self.scale.y, self.scale.z)
+        # GL.glUseProgram(self._shader)
+        GL.glColor3f(1, 0, 0)
         GL.glBegin(GL.GL_QUADS)
         GL.glTexCoord2f(self._letterCoordStart.x, self._letterCoordEnd.y)
         GL.glVertex2f(0, 0)
+        GL.glColor3f(1, 0, 1)
         GL.glTexCoord2f(self._letterCoordEnd.x, self._letterCoordEnd.y)
         GL.glVertex2f(1, 0)
+        GL.glColor3f(1, 1, 1)
         GL.glTexCoord2f(self._letterCoordEnd.x, self._letterCoordStart.y)
         GL.glVertex2f(1, 1)
+        GL.glColor3f(0, 0, 1)
         GL.glTexCoord2f(self._letterCoordStart.x, self._letterCoordStart.y)
         GL.glVertex2f(0, 1)
         GL.glEnd()
+        # GL.glUseProgram(0)
         GL.glPopMatrix()
         GL.glBindTexture(GL.GL_TEXTURE_2D, 0)
-        # GL.glUseProgram(0)
         GL.glDisable(GL.GL_TEXTURE_2D)
 
-    # GL.glDisable(GL.GL_BLEND)
+        GL.glDisable(GL.GL_BLEND)
